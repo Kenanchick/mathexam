@@ -38,7 +38,7 @@ export const TeacherClassesSection = ({
         </div>
       ) : (
       <div className="divide-y divide-gray-100">
-        {classes.map((cls, index) => (
+        {classes.slice(0, 3).map((cls, index) => (
           <motion.div
             key={cls.id}
             initial={{ opacity: 0, x: 12 }}
@@ -110,6 +110,25 @@ export const TeacherClassesSection = ({
         ))}
       </div>
       )}
+
+      {classes.length > 3 && (
+        <div className="border-t border-gray-100 px-6 py-3">
+          <Link
+            href="/dashboard/teacher/classes"
+            className="flex items-center gap-1.5 text-sm font-medium text-blue-600 transition-colors hover:text-blue-700"
+          >
+            Ещё {classes.length - 3} {pluralizeClasses(classes.length - 3)}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      )}
     </motion.div>
   );
 };
+
+function pluralizeClasses(n: number): string {
+  if (n % 10 === 1 && n % 100 !== 11) return "класс";
+  if (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20))
+    return "класса";
+  return "классов";
+}

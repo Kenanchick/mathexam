@@ -39,12 +39,22 @@ export type TeacherDashboardActivity = {
   badge?: ActivityBadge;
 };
 
+export type TeacherDeadlineItem = {
+  id: string;
+  title: string;
+  classroomName: string | null;
+  deadline: Date;
+  submittedCount: number;
+  totalCount: number;
+};
+
 export type TeacherDashboardData = {
   teacherName: string;
   stats: TeacherDashboardStats;
   classes: TeacherDashboardClass[];
   reviews: TeacherDashboardReview[];
   activityEvents: TeacherDashboardActivity[];
+  upcomingDeadlines: TeacherDeadlineItem[];
 };
 
 function formatRelativeTime(date: Date): string {
@@ -114,6 +124,9 @@ function getAvatarText(
 export async function getTeacherDashboardData(
   teacherId: string,
 ): Promise<TeacherDashboardData> {
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+
   const [
     teacher,
     classrooms,
@@ -121,6 +134,7 @@ export async function getTeacherDashboardData(
     avgScoreResult,
     reviews,
     activityLogs,
+    deadlineHomeworks,
   ] = await Promise.all([
     prisma.user.findUnique({
       where: { id: teacherId },
@@ -198,6 +212,23 @@ export async function getTeacherDashboardData(
         classroom: { select: { title: true } },
       },
     }),
+
+    prisma.homework.findMany({
+      where: {
+        teacherId,
+        status: "PUBLISHED",
+        deadline: { gte: todayStart },
+      },
+      orderBy: { deadline: "asc" },
+      take: 4,
+      select: {
+        id: true,
+        title: true,
+        deadline: true,
+        classroom: { select: { title: true } },
+        recipients: { select: { status: true } },
+      },
+    }),
   ]);
 
   const sumStudents = classrooms.reduce((sum, c) => sum + c._count.students, 0);
@@ -242,6 +273,20 @@ export async function getTeacherDashboardData(
     badge: badgeFromType(e.type),
   }));
 
+  const mappedDeadlines: TeacherDeadlineItem[] = deadlineHomeworks.map((hw) => {
+    const submitted = hw.recipients.filter((r) =>
+      ["SUBMITTED", "CHECKING", "CHECKED", "RETURNED"].includes(r.status),
+    ).length;
+    return {
+      id: hw.id,
+      title: hw.title,
+      classroomName: hw.classroom?.title ?? null,
+      deadline: hw.deadline!,
+      submittedCount: submitted,
+      totalCount: hw.recipients.length,
+    };
+  });
+
   return {
     teacherName: teacher?.name ?? "Учитель",
     stats: {
@@ -253,5 +298,6 @@ export async function getTeacherDashboardData(
     classes: mappedClasses,
     reviews: mappedReviews,
     activityEvents: mappedActivity,
+    upcomingDeadlines: mappedDeadlines,
   };
 }

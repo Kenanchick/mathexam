@@ -10,7 +10,7 @@ const QUICK_ACTIONS = [
     icon: FileText,
     label: "Создать домашнее задание",
     description: "Назначьте задание классу или ученикам",
-    href: "/dashboard/teacher/homework/new",
+    href: "/dashboard/teacher/homework/create",
     iconClass: "text-blue-600 bg-blue-50",
     hoverClass: "hover:border-blue-200 hover:bg-blue-50/60",
   },
