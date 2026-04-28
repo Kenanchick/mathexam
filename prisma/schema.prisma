@@ -1,0 +1,530 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+enum ClassMemberStatus {
+  ACTIVE
+  INVITED
+  REMOVED
+}
+
+enum TaskDifficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum TaskStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum AnswerType {
+  SHORT
+  NUMERIC
+  TEXT
+}
+
+enum AttemptResult { //попытки решения задач
+  PENDING
+  CORRECT
+  WRONG
+  PARTIAL
+}
+
+enum HomeworkStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+  ARCHIVED
+}
+
+enum HomeworkRecipientStatus {
+  ASSIGNED
+  IN_PROGRESS
+  SUBMITTED
+  CHECKING
+  CHECKED
+  RETURNED
+  OVERDUE
+}
+
+enum NotificationType {
+  HOMEWORK_ASSIGNED
+  HOMEWORK_SUBMITTED
+  HOMEWORK_CHECKED
+  HOMEWORK_RETURNED
+  DEADLINE_REMINDER
+  TEACHER_COMMENT
+  CLASS_INVITE
+  SYSTEM
+}
+
+enum ActivityEventType {
+  HOMEWORK_SUBMITTED
+  HOMEWORK_CHECKING
+  HOMEWORK_CHECKED
+  HOMEWORK_RETURNED
+  HOMEWORK_OVERDUE
+  STUDENT_JOINED
+}
+
+model User {
+  id String @id @default(uuid()) 
+  email String @unique
+  name String?
+  passwordHash String
+  avatarUrl String?
+  role UserRole @default(STUDENT)
+
+  isActive Boolean @default(true) //если админ заблокировал ученика, то он не сможет войти в систему
+  lastLoginAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  studentProfile StudentProfile? //если пользователь ученикб, то у него будет профиль ученика 
+  teacherProfile TeacherProfile? //если пользователь учитель, то у него будет профиль учителя иначе null
+
+  teachingClasses Classroom[] @relation("TeacherClassrooms") //классы, которые ведет учитель, может быть несколько
+  classMemberships ClassStudent[] @relation("ClassStudentUser") //классы в которых состоит ученик
+
+  authoredTasks Task[] @relation("TaskAuthor")
+
+  taskAttempts TaskAttempt[] @relation("StudentTaskAttempts") //попытки решения задач
+  checkedTasksAttempts TaskAttempt[] @relation("CheckedTaskAttempts") //попытки решения задач, проверенные учителем
+
+  createdHomeworks Homework[] @relation("TeacherHomeworks")
+  homeworkRecipients HomeworkRecipient[] @relation("StudentHomeworkRecipients")
+  checkedHomeworkAnswers HomeworkAnswer[] @relation("CheckedHomeworkAnswers")
+
+  topicProgress StudentTopicProgress[] @relation("StudentTopicProgressUser")
+  dailyActivities StudentDailyActivity[] @relation("StudentDailyActivityUser")
+
+  notifications Notification[]
+
+  activityLogs    ActivityLog[] @relation("TeacherActivityLog")
+  studentActivity ActivityLog[] @relation("StudentActivityLog")
+
+  @@index([role])
+  @@index([createdAt])
+}
+
+model EmailVerificationCode {
+  id String @id @default(uuid())
+
+  email String @unique
+  name String
+  passwordHash String
+  role UserRole
+
+  codeHash String
+  attempts Int @default(0)
+  expiresAt DateTime
+  consumedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([expiresAt])
+}
+
+model StudentProfile {
+  id String @id @default(uuid())
+  userId String @unique
+  school String?
+  grade String?
+  city String?
+  targetScore Int?
+  dailyGoalTasks Int @default(10)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model TeacherProfile {
+  id String @id @default(uuid())
+  userId String @unique
+  subject String @default("Профильная математкиа")
+  city String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Classroom { //класс учителя
+  id String @id @default(uuid())
+  teacherId String //id учителя, который ведет класс
+
+  title String
+  description String?
+  inviteCode String @unique
+
+  isArchived Boolean @default(false) //если класс заархивирован, то он не будет отображаться в списке классов
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  teacher User @relation("TeacherClassrooms", fields: [teacherId], references: [id], onDelete: Cascade) //связи класа с учиетелем
+
+  students ClassStudent[]
+  homeworks Homework[]
+  activityLogs ActivityLog[]
+
+  @@index([teacherId])
+  @@index([isArchived])
+}
+
+model ClassStudent { //связь между классом и учениклм. В одном классе много учеников и у каждого ученика может быть несколько классов
+  id String @id @default(uuid())
+  classroomId String
+  studentId String
+
+  status ClassMemberStatus @default(ACTIVE)
+
+  joinedAt DateTime @default(now())
+  removedAt DateTime?
+
+  classroom Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  student User @relation("ClassStudentUser", fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([classroomId, studentId])
+  @@index([studentId])
+  @@index([status])
+}
+
+model Topic {
+  id String @id @default(uuid())
+  title String
+  
+  slug String @unique
+  description String?
+  order Int 
+  subtopics Subtopic[]
+  tasks Task[]
+
+  studentProgress StudentTopicProgress[]
+
+  @@index([order])
+} 
+
+model Subtopic {
+  id      String @id @default(uuid())
+  topicId String
+
+  title       String
+  slug        String
+  description String?
+  order       Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  topic Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  tasks Task[]
+
+  @@unique([topicId, slug])
+  @@index([topicId])
+  @@index([order])
+}
+
+model Task {
+  id String @id @default(uuid())
+  authorId String?
+  topicId String
+  subtopicId String?
+
+  examNumber Int
+  title String?
+  condition String @db.Text //условие задачи, может быть длинным текстом
+  imageUrl String?
+
+  difficulty TaskDifficulty @default(MEDIUM) // сложность
+  status TaskStatus @default(DRAFT) //статус задачи по умолчанию черновик
+  answerType AnswerType @default(SHORT) //тип ответа, по умолчанию короткий ответ
+
+  correctAnswer String //правильный ответ
+  acceptedAnswers String[] @default([]) //допустимые варианты ответов
+
+  solution String? @db.Text // длинное решение
+  hints String[] @default([]) // подсказки для решения задачи
+
+
+  source String? //исчтоник
+  solveTimeSec Int? //примерное время решения в секундах
+
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  publishedAt DateTime?
+
+  author   User?     @relation("TaskAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  topic    Topic     @relation(fields: [topicId], references: [id], onDelete: Restrict)
+  subtopic Subtopic? @relation(fields: [subtopicId], references: [id], onDelete: SetNull)
+
+  attempts TaskAttempt[] //попытки решения задач
+  homeworkTasks HomeworkTask[]
+
+  @@index([examNumber])
+  @@index([topicId])
+  @@index([subtopicId])
+  @@index([difficulty])
+  @@index([status])
+  @@index([examNumber, status])
+}
+
+model TaskAttempt {
+  id String @id @default(uuid())
+  studentId String
+  taskId String
+  
+  answer String?
+  normalizedAnswer String? //нормализованный ответ, например, для числовых ответов, можно преобразовать в число
+
+  result AttemptResult @default(PENDING)
+  isCorrect Boolean @default(false)
+
+  score Float? //баллы за задачу
+  timeSpentSec Int?
+
+  startedAt DateTime?
+  submittedAt DateTime @default(now()) //время отправки ответа
+
+  checkedById String? //id учителя или админа, который проверил задачу
+  teacherComment String? @db.Text
+  checkedAt DateTime?
+
+  student User @relation("StudentTaskAttempts", fields: [studentId], references: [id], onDelete: Cascade)
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+
+  checkedBy User? @relation("CheckedTaskAttempts", fields: [checkedById], references: [id], onDelete: SetNull)
+
+
+
+  @@index([studentId])
+  @@index([taskId])
+  @@index([result])
+  @@index([submittedAt])
+  @@index([studentId, taskId])
+}
+
+
+model Homework {
+  id          String @id @default(uuid())
+  teacherId   String
+  classroomId String?
+
+  title       String
+  description String? @db.Text
+
+  deadline DateTime?
+  status   HomeworkStatus @default(DRAFT)
+
+  allowRetries Boolean @default(true)
+  showSolutionAfterSubmit Boolean @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  publishedAt DateTime?
+
+  teacher User @relation("TeacherHomeworks", fields: [teacherId], references: [id], onDelete: Cascade)
+  classroom Classroom? @relation(fields: [classroomId], references: [id], onDelete: SetNull)
+
+  tasks HomeworkTask[]
+  recipients HomeworkRecipient[]
+  activityLogs ActivityLog[]
+
+  @@index([teacherId])
+  @@index([classroomId])
+  @@index([status])
+  @@index([deadline])
+}
+
+model HomeworkTask {
+  id         String @id @default(uuid())
+  homeworkId String
+  taskId     String
+
+  order  Int
+  points Float @default(1)
+
+  homework Homework @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
+  task     Task     @relation(fields: [taskId], references: [id], onDelete: Restrict)
+
+  answers HomeworkAnswer[]
+
+  @@unique([homeworkId, taskId])
+  @@index([homeworkId])
+  @@index([taskId])
+}
+
+model HomeworkRecipient {
+  id         String @id @default(uuid())
+  homeworkId String
+  studentId  String
+
+  status HomeworkRecipientStatus @default(ASSIGNED)
+
+  progressPercent Float @default(0)
+  scorePercent    Float?
+
+  startedAt   DateTime?
+  submittedAt DateTime?
+  checkedAt   DateTime?
+
+  teacherComment String? @db.Text
+
+  homework Homework @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
+  student  User     @relation("StudentHomeworkRecipients", fields: [studentId], references: [id], onDelete: Cascade)
+
+  answers HomeworkAnswer[]
+
+  @@unique([homeworkId, studentId])
+  @@index([studentId])
+  @@index([status])
+}
+
+model HomeworkAnswer {
+  id                  String @id @default(uuid())
+  homeworkRecipientId String
+  homeworkTaskId      String
+
+  answer  String?
+  fileUrl String?
+
+  attemptNo Int @default(1)
+  result    AttemptResult @default(PENDING)
+
+  score          Float?
+  teacherComment String? @db.Text
+
+  submittedAt DateTime?
+  checkedAt   DateTime?
+
+  checkedById String?
+
+  recipient    HomeworkRecipient @relation(fields: [homeworkRecipientId], references: [id], onDelete: Cascade)
+  homeworkTask HomeworkTask      @relation(fields: [homeworkTaskId], references: [id], onDelete: Cascade)
+
+  checkedBy User? @relation("CheckedHomeworkAnswers", fields: [checkedById], references: [id], onDelete: SetNull)
+
+  @@unique([homeworkRecipientId, homeworkTaskId, attemptNo])
+  @@index([homeworkRecipientId])
+  @@index([homeworkTaskId])
+  @@index([result])
+}
+
+model StudentTopicProgress {
+  id        String @id @default(uuid())
+  studentId String
+  topicId   String
+
+  solvedCount  Int @default(0)
+  correctCount Int @default(0)
+  wrongCount   Int @default(0)
+
+  accuracyPercent Float @default(0)
+  masteryPercent  Float @default(0)
+
+  averageTimeSec Int?
+
+  lastSolvedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  student User  @relation("StudentTopicProgressUser", fields: [studentId], references: [id], onDelete: Cascade)
+  topic   Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, topicId])
+  @@index([studentId])
+  @@index([topicId])
+  @@index([masteryPercent])
+}
+
+model StudentDailyActivity {
+  id        String   @id @default(uuid())
+  studentId String
+  date      DateTime @db.Date
+
+  solvedCount  Int @default(0)
+  correctCount Int @default(0)
+  wrongCount   Int @default(0)
+
+  minutesSpent Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  student User @relation("StudentDailyActivityUser", fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, date])
+  @@index([studentId])
+  @@index([date])
+}
+
+
+model Notification {
+  id     String @id @default(uuid())
+  userId String
+
+  type    NotificationType
+  title   String
+  message String? @db.Text
+
+  href String?
+
+  isRead Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  readAt    DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+  @@index([userId, isRead])
+}
+
+model ActivityLog {
+  id          String            @id @default(uuid())
+  teacherId   String
+  studentId   String?
+  classroomId String?
+  homeworkId  String?
+
+  type    ActivityEventType
+
+  createdAt DateTime @default(now())
+
+  teacher   User       @relation("TeacherActivityLog", fields: [teacherId], references: [id], onDelete: Cascade)
+  student   User?      @relation("StudentActivityLog", fields: [studentId], references: [id], onDelete: SetNull)
+  classroom Classroom? @relation(fields: [classroomId], references: [id], onDelete: SetNull)
+  homework  Homework?  @relation(fields: [homeworkId], references: [id], onDelete: SetNull)
+
+  @@index([teacherId])
+  @@index([teacherId, createdAt])
+}
