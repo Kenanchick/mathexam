@@ -17,18 +17,15 @@ export type HomeworkItemView = {
   status: HomeworkStatus;
 };
 
-export type HomeworkCalendar = {
-  monthTitle: string;
-  today: number;
-  deadlineDays: number[];
-  rows: (number | null)[][];
-  upcomingDeadlines: { title: string; date: string; color: "yellow" | "blue" }[];
+export type DeadlineEntry = {
+  title: string;
+  deadlineIso: string;
 };
 
 export type HomeworkPageData = {
   items: HomeworkItemView[];
   stats: { totalActive: number; newCount: number; submittedThisMonth: number };
-  calendar: HomeworkCalendar;
+  deadlines: DeadlineEntry[];
 };
 
 type DbStatus =
@@ -62,31 +59,6 @@ function computeStatus(
   if (dbStatus === "ASSIGNED") return "new";
   if (dbStatus === "IN_PROGRESS" || dbStatus === "RETURNED") return "in_progress";
   return "submitted";
-}
-
-function buildCalendarRows(year: number, month: number): (number | null)[][] {
-  const firstDay = new Date(year, month, 1);
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstWeekday = (firstDay.getDay() + 6) % 7;
-
-  const cells: (number | null)[] = [
-    ...Array<null>(firstWeekday).fill(null),
-    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
-  ];
-  while (cells.length % 7 !== 0) cells.push(null);
-
-  const rows: (number | null)[][] = [];
-  for (let i = 0; i < cells.length; i += 7) {
-    rows.push(cells.slice(i, i + 7));
-  }
-  return rows;
-}
-
-function buildMonthTitle(year: number, month: number): string {
-  const name = new Intl.DateTimeFormat("ru-RU", { month: "long" }).format(
-    new Date(year, month),
-  );
-  return `${name[0].toUpperCase()}${name.slice(1)} ${year}`;
 }
 
 export async function getHomeworkData(studentId: string): Promise<HomeworkPageData> {
@@ -137,7 +109,6 @@ export async function getHomeworkData(studentId: string): Promise<HomeworkPageDa
     };
   });
 
-  // Stats
   const totalActive = items.filter(
     (i) => i.status === "new" || i.status === "in_progress",
   ).length;
@@ -148,41 +119,13 @@ export async function getHomeworkData(studentId: string): Promise<HomeworkPageDa
     return s === "submitted" && r.submittedAt && r.submittedAt >= startOfMonth;
   }).length;
 
-  // Calendar
-  const year = now.getFullYear();
-  const month = now.getMonth();
-  const today = now.getDate();
-  const rows = buildCalendarRows(year, month);
-  const monthTitle = buildMonthTitle(year, month);
-
-  const deadlineDays = [
-    ...new Set(
-      items
-        .filter((i) => i.deadlineIso)
-        .map((i) => new Date(i.deadlineIso!))
-        .filter((d) => d.getFullYear() === year && d.getMonth() === month)
-        .map((d) => d.getDate()),
-    ),
-  ];
-
-  const fourteenDaysMs = 14 * 24 * 60 * 60 * 1000;
-  const upcomingDeadlines = items
-    .filter((i) => {
-      if (!i.deadlineIso) return false;
-      const d = new Date(i.deadlineIso);
-      return d > now && d.getTime() - now.getTime() <= fourteenDaysMs;
-    })
-    .sort((a, b) => new Date(a.deadlineIso!).getTime() - new Date(b.deadlineIso!).getTime())
-    .slice(0, 3)
-    .map((i, idx) => ({
-      title: i.title,
-      date: i.deadline.replace(/^до /, ""),
-      color: idx === 0 ? ("yellow" as const) : ("blue" as const),
-    }));
+  const deadlines: DeadlineEntry[] = items
+    .filter((i) => i.deadlineIso !== null)
+    .map((i) => ({ title: i.title, deadlineIso: i.deadlineIso! }));
 
   return {
     items,
     stats: { totalActive, newCount, submittedThisMonth },
-    calendar: { monthTitle, today, deadlineDays, rows, upcomingDeadlines },
+    deadlines,
   };
 }

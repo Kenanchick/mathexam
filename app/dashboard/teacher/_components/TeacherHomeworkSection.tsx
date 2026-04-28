@@ -112,11 +112,15 @@ export const TeacherHomeworkSection = ({
                   </td>
                   <td className="py-3.5 pr-6">
                     <Button
+                      asChild
                       variant="outline"
                       size="sm"
-                      className="h-8 rounded-lg border-gray-200 text-xs font-medium text-gray-700 transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
+                      className="h-8 gap-1.5 rounded-lg border-gray-200 text-xs font-medium text-gray-700 transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
                     >
-                      {item.status === "needs_comment" ? "Открыть" : "Проверить"}
+                      <Link href={`/dashboard/teacher/review/${item.id}`}>
+                        {item.status === "needs_comment" ? "Открыть" : "Проверить"}
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </Link>
                     </Button>
                   </td>
                 </motion.tr>

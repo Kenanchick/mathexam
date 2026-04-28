@@ -391,13 +391,77 @@ export async function getStudentDashboard(
 
     progressChart,
 
-    recommendedTopics: topicProgress.map((progress) => ({
-      id: progress.id,
-      title: progress.topic.title,
-      description:
-        progress.topic.description ??
-        `Точность: ${Math.round(progress.accuracyPercent)}%`,
-      percent: Math.round(progress.masteryPercent),
-    })),
+    recommendedTopics: await buildRecommendedTopics(studentId, topicProgress),
   };
+}
+
+type TopicProgressItem = {
+  id: string;
+  masteryPercent: number;
+  accuracyPercent: number;
+  solvedCount: number;
+  topic: { title: string; description: string | null };
+};
+
+async function buildRecommendedTopics(
+  studentId: string,
+  topicProgress: TopicProgressItem[],
+) {
+  const result = topicProgress.map((p) => ({
+    id: p.id,
+    title: p.topic.title,
+    description:
+      p.topic.description ?? `Точность: ${Math.round(p.accuracyPercent)}%`,
+    percent: Math.round(p.masteryPercent),
+  }));
+
+  if (result.length >= 3) return result.slice(0, 3);
+
+  // Fallback: look for weak topics from recent wrong homework answers
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const wrongAnswers = await prisma.homeworkAnswer.findMany({
+    where: {
+      recipient: { studentId },
+      result: { in: ["WRONG", "PARTIAL"] },
+      submittedAt: { gte: thirtyDaysAgo, not: null },
+    },
+    select: {
+      homeworkTask: {
+        select: {
+          task: {
+            select: {
+              topicId: true,
+              topic: { select: { title: true, description: true } },
+            },
+          },
+        },
+      },
+    },
+    take: 30,
+  });
+
+  const alreadyShown = new Set(result.map((r) => r.title));
+  const topicCounts = new Map<string, { title: string; description: string | null; count: number }>();
+
+  for (const wa of wrongAnswers) {
+    const topic = wa.homeworkTask.task.topic;
+    const id = wa.homeworkTask.task.topicId;
+    if (alreadyShown.has(topic.title)) continue;
+    const current = topicCounts.get(id) ?? { title: topic.title, description: topic.description, count: 0 };
+    topicCounts.set(id, { ...current, count: current.count + 1 });
+  }
+
+  const fallback = Array.from(topicCounts.entries())
+    .sort((a, b) => b[1].count - a[1].count)
+    .slice(0, 3 - result.length)
+    .map(([id, { title, description, count }]) => ({
+      id,
+      title,
+      description: description ?? `Ошибок в домашних: ${count}`,
+      percent: Math.max(5, Math.min(40, 100 - count * 10)),
+    }));
+
+  return [...result, ...fallback].slice(0, 3);
 }

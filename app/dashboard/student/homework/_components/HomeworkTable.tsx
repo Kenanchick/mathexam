@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { HomeworkStatusBadge } from "./HomeworkStatusBadge";
 import { HomeworkProgress } from "./HomeworkProgress";
@@ -103,9 +104,12 @@ export const HomeworkTable = ({ items }: HomeworkTableProps) => {
                     <HomeworkStatusBadge status={item.status} />
                   </td>
                   <td className="px-5 py-4">
-                    <button className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-700 shadow-sm transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 hover:shadow-md group-hover:border-blue-200">
+                    <Link
+                      href={`/dashboard/student/homework/${item.id}`}
+                      className="inline-block rounded-xl border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-700 shadow-sm transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 hover:shadow-md group-hover:border-blue-200"
+                    >
                       {actionLabel[item.status]}
-                    </button>
+                    </Link>
                   </td>
                 </motion.tr>
               ))}

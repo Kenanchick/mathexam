@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search } from "lucide-react";
 import { HomeworkTabs } from "./HomeworkTabs";
 import { HomeworkTable } from "./HomeworkTable";
 import { UpcomingDeadlineCard } from "./UpcomingDeadlineCard";
@@ -68,21 +68,15 @@ export const HomeworkPage = ({ data }: HomeworkPageProps) => {
             />
           </div>
 
-          <div className="flex gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Поиск по названию или учителю"
-                className="h-11 w-full rounded-xl border border-gray-200 bg-white pl-10 pr-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
-              />
-            </div>
-            <button className="flex h-11 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 text-sm font-medium text-gray-600 shadow-sm transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600">
-              <SlidersHorizontal className="h-4 w-4" />
-              Фильтры
-            </button>
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Поиск по названию или учителю"
+              className="h-11 w-full rounded-xl border border-gray-200 bg-white pl-10 pr-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+            />
           </div>
 
           <HomeworkTable items={filteredItems} />
@@ -95,7 +89,7 @@ export const HomeworkPage = ({ data }: HomeworkPageProps) => {
           transition={{ duration: 0.28, delay: 0.1 }}
           className="space-y-4"
         >
-          <UpcomingDeadlineCard calendar={data.calendar} />
+          <UpcomingDeadlineCard deadlines={data.deadlines} />
           <HomeworkStatsCard stats={data.stats} />
         </motion.div>
       </div>
