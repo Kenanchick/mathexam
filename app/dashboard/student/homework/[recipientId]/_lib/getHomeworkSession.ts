@@ -31,6 +31,7 @@ export type HomeworkSession = {
   recipientId: string;
   homeworkId: string;
   title: string;
+  description: string | null;
   teacherName: string;
   deadline: Date | null;
   status:
@@ -65,6 +66,7 @@ export async function getHomeworkSession(
         select: {
           id: true,
           title: true,
+          description: true,
           deadline: true,
           showSolutionAfterSubmit: true,
           teacher: { select: { name: true } },
@@ -148,6 +150,7 @@ export async function getHomeworkSession(
     recipientId: recipient.id,
     homeworkId: recipient.homework.id,
     title: recipient.homework.title,
+    description: recipient.homework.description ?? null,
     teacherName: recipient.homework.teacher.name ?? "Преподаватель",
     deadline: recipient.homework.deadline,
     status: recipient.status as HomeworkSession["status"],

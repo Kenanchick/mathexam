@@ -75,7 +75,9 @@ export const HomeworkSessionPage = ({ session }: Props) => {
   );
 
   const answeredCount = session.tasks.filter(
-    (t) => t.answer?.submittedAt !== null && t.answer?.submittedAt !== undefined,
+    (t) =>
+      (t.answer?.submittedAt != null) ||
+      (t.answer?.checkedAt != null),
   ).length;
 
   const canSubmit = answeredCount > 0 && !isReadOnly;
@@ -206,6 +208,23 @@ export const HomeworkSessionPage = ({ session }: Props) => {
           </div>
         </div>
       </motion.div>
+
+      {/* Teacher description / task instructions */}
+      {session.description && (
+        <motion.div
+          initial={{ opacity: 0, y: -6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25 }}
+          className="mb-5 rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4"
+        >
+          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-blue-500">
+            Комментарий преподавателя
+          </p>
+          <p className="text-sm leading-relaxed text-blue-900 whitespace-pre-wrap">
+            {session.description}
+          </p>
+        </motion.div>
+      )}
 
       {/* Result banner for checked homework */}
       {(session.status === "CHECKED" || session.status === "RETURNED") &&

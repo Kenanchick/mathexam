@@ -30,7 +30,12 @@ export async function submitHomework(input: unknown) {
 
   const recipient = await prisma.homeworkRecipient.findUnique({
     where: { id: recipientId },
-    select: { id: true, studentId: true, status: true },
+    select: {
+      id: true,
+      studentId: true,
+      status: true,
+      homeworkId: true,
+    },
   });
 
   if (!recipient || recipient.studentId !== student.id) {
@@ -52,6 +57,11 @@ export async function submitHomework(input: unknown) {
   revalidatePath(`/dashboard/student/homework/${recipientId}`);
   revalidatePath("/dashboard/student/homework");
   revalidatePath("/dashboard/student");
+  revalidatePath(`/dashboard/teacher/review/${recipientId}`);
+  revalidatePath(`/dashboard/teacher/homework/${recipient.homeworkId}`);
+  revalidatePath("/dashboard/teacher/homework");
+  revalidatePath("/dashboard/teacher/reviews");
+  revalidatePath("/dashboard/teacher");
 
   return { success: true as const };
 }

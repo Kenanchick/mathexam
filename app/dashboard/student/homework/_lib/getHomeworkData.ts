@@ -84,7 +84,12 @@ export async function getHomeworkData(studentId: string): Promise<HomeworkPageDa
         },
       },
       answers: {
-        where: { submittedAt: { not: null } },
+        where: {
+          OR: [
+            { submittedAt: { not: null } },
+            { checkedAt: { not: null } },
+          ],
+        },
         select: { homeworkTaskId: true },
       },
     },
