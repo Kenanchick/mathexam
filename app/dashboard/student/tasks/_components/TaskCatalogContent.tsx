@@ -85,11 +85,14 @@ export const TasksCatalogContent = ({
   };
 
   return (
-    <div>
-      <div className="mb-7">
-        <h1 className="text-3xl font-bold tracking-[-0.03em] text-gray-950">
+    <div className="w-full">
+      <div className="mb-4">
+        <h1 className="text-[24px] font-semibold leading-tight text-gray-900">
           Каталог задач
         </h1>
+        <p className="mt-1 text-[16px] text-gray-500">
+          Задания ЕГЭ · Профильная математика
+        </p>
       </div>
 
       <TaskCatalogFilters
@@ -108,13 +111,13 @@ export const TasksCatalogContent = ({
         onReset={handleResetFilters}
       />
 
-      <div className="mt-6 grid grid-cols-[minmax(0,1fr)_320px] gap-6">
-        <div className="space-y-4">
+      <div className="mt-5 grid grid-cols-[minmax(0,1fr)_296px] gap-5">
+        <div className="space-y-3">
           {filteredTasks.length > 0 ? (
             filteredTasks.map((task) => <TaskCard key={task.id} task={task} />)
           ) : (
-            <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center text-gray-500 shadow-sm">
-              По выбранным фильтрам задач не найдено
+            <div className="rounded border border-gray-200 bg-white px-6 py-8 text-[15px] text-gray-500">
+              По выбранным фильтрам задач не найдено.
             </div>
           )}
         </div>

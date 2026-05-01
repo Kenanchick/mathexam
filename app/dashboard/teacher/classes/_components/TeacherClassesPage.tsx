@@ -5,14 +5,15 @@ import { motion } from "framer-motion";
 import { Plus, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ClassCard } from "./ClassCard";
-import { CreateClassModal } from "./CreateClassModal";
+import { CreateClassModal, type PersonalStudentOption } from "./CreateClassModal";
 import type { TeacherClassDetail } from "../_lib/getTeacherClassesData";
 
 interface TeacherClassesPageProps {
   classes: TeacherClassDetail[];
+  personalStudents: PersonalStudentOption[];
 }
 
-export const TeacherClassesPage = ({ classes }: TeacherClassesPageProps) => {
+export const TeacherClassesPage = ({ classes, personalStudents }: TeacherClassesPageProps) => {
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
@@ -24,8 +25,8 @@ export const TeacherClassesPage = ({ classes }: TeacherClassesPageProps) => {
         className="mb-6 flex items-start justify-between"
       >
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Классы</h1>
-          <p className="mt-1 text-base text-gray-500">
+          <h1 className="text-4xl font-bold text-gray-900">Классы</h1>
+          <p className="mt-1.5 text-lg text-gray-500">
             {classes.length > 0
               ? `${classes.length} ${pluralizeClasses(classes.length)} · ${sumStudents(classes)} учеников`
               : "Создайте первый класс и пригласите учеников"}
@@ -34,7 +35,7 @@ export const TeacherClassesPage = ({ classes }: TeacherClassesPageProps) => {
 
         <Button
           onClick={() => setModalOpen(true)}
-          className="gap-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700"
+          className="gap-2 rounded-xl bg-gray-900 text-white hover:bg-gray-800"
         >
           <Plus className="h-4 w-4" />
           Создать класс
@@ -48,8 +49,8 @@ export const TeacherClassesPage = ({ classes }: TeacherClassesPageProps) => {
           transition={{ duration: 0.4, delay: 0.1 }}
           className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-gray-200 bg-white py-20 text-center"
         >
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50">
-            <GraduationCap className="h-8 w-8 text-blue-500" />
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100">
+            <GraduationCap className="h-8 w-8 text-gray-400" />
           </div>
           <div>
             <p className="text-base font-semibold text-gray-700">
@@ -61,7 +62,7 @@ export const TeacherClassesPage = ({ classes }: TeacherClassesPageProps) => {
           </div>
           <Button
             onClick={() => setModalOpen(true)}
-            className="mt-2 gap-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700"
+            className="mt-2 gap-2 rounded-xl bg-gray-900 text-white hover:bg-gray-800"
           >
             <Plus className="h-4 w-4" />
             Создать первый класс
@@ -75,7 +76,11 @@ export const TeacherClassesPage = ({ classes }: TeacherClassesPageProps) => {
         </div>
       )}
 
-      <CreateClassModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      <CreateClassModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        personalStudents={personalStudents}
+      />
     </div>
   );
 };

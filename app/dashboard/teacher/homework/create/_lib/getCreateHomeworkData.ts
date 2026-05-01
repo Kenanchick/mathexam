@@ -9,6 +9,14 @@ export type ClassroomOption = {
   students: { id: string; name: string | null }[];
 };
 
+export type AllStudentOption = {
+  id: string;
+  name: string | null;
+  email: string;
+  classroomId: string;
+  classroomTitle: string;
+};
+
 export type TaskForPicker = {
   id: string;
   examNumber: number;
@@ -26,6 +34,7 @@ export type TopicOption = {
 
 export type CreateHomeworkPageData = {
   classrooms: ClassroomOption[];
+  allStudents: AllStudentOption[];
   tasks: TaskForPicker[];
   topics: TopicOption[];
 };
@@ -87,5 +96,56 @@ export async function getCreateHomeworkData(
     students: c.students.map((cs) => cs.student),
   }));
 
-  return { classrooms: mappedClassrooms, tasks: mappedTasks, topics };
+  // Flatten all students: classes + direct (deduplicated by student id)
+  const seen = new Set<string>();
+  const allStudents: AllStudentOption[] = [];
+
+  const [fullClassrooms, directLinks] = await Promise.all([
+    prisma.classroom.findMany({
+      where: { teacherId, isArchived: false },
+      select: {
+        id: true,
+        title: true,
+        students: {
+          where: { status: "ACTIVE" },
+          select: {
+            student: { select: { id: true, name: true, email: true } },
+          },
+        },
+      },
+    }),
+    prisma.teacherStudent.findMany({
+      where: { teacherId, status: "ACTIVE" },
+      select: {
+        student: { select: { id: true, name: true, email: true } },
+      },
+    }),
+  ]);
+
+  for (const cls of fullClassrooms) {
+    for (const cs of cls.students) {
+      if (seen.has(cs.student.id)) continue;
+      seen.add(cs.student.id);
+      allStudents.push({
+        id: cs.student.id,
+        name: cs.student.name,
+        email: cs.student.email,
+        classroomId: cls.id,
+        classroomTitle: cls.title,
+      });
+    }
+  }
+  for (const link of directLinks) {
+    if (seen.has(link.student.id)) continue;
+    seen.add(link.student.id);
+    allStudents.push({
+      id: link.student.id,
+      name: link.student.name,
+      email: link.student.email,
+      classroomId: "__direct__",
+      classroomTitle: "Личные ученики",
+    });
+  }
+
+  return { classrooms: mappedClassrooms, allStudents, tasks: mappedTasks, topics };
 }

@@ -50,10 +50,10 @@ export const Part1TaskCard = ({
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
           <div className="mb-1.5 flex flex-wrap items-center gap-2">
-            <span className="rounded-lg bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700">
+            <span className="rounded bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
               Задание {task.examNumber}
             </span>
-            <span className="rounded-lg bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-500">
+            <span className="rounded bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-500">
               Часть 1 · Краткий ответ
             </span>
             <span className="text-xs text-gray-400">{task.points} б.</span>
@@ -66,7 +66,7 @@ export const Part1TaskCard = ({
           <button
             onClick={onPrev}
             disabled={taskIndex === 0}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition hover:border-gray-300 hover:text-gray-600 disabled:opacity-40"
+            className="flex h-8 w-8 items-center justify-center rounded border border-gray-200 text-gray-400 transition hover:border-gray-300 hover:text-gray-600 disabled:opacity-40"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -76,7 +76,7 @@ export const Part1TaskCard = ({
           <button
             onClick={onNext}
             disabled={taskIndex === totalTasks - 1}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition hover:border-gray-300 hover:text-gray-600 disabled:opacity-40"
+            className="flex h-8 w-8 items-center justify-center rounded border border-gray-200 text-gray-400 transition hover:border-gray-300 hover:text-gray-600 disabled:opacity-40"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -85,7 +85,7 @@ export const Part1TaskCard = ({
 
       {/* Task image */}
       {task.imageUrl && (
-        <div className="mb-5 overflow-hidden rounded-xl border border-gray-200">
+        <div className="mb-5 overflow-hidden rounded border border-gray-200">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={task.imageUrl}
@@ -96,7 +96,7 @@ export const Part1TaskCard = ({
       )}
 
       {/* Task condition */}
-      <div className="mb-6 flex-1 rounded-2xl border border-gray-200 bg-gray-50 p-5">
+      <div className="mb-6 flex-1 rounded border border-gray-200 bg-gray-50 p-5">
         <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-800">
           {task.condition}
         </p>
@@ -104,7 +104,7 @@ export const Part1TaskCard = ({
 
       {/* Answer block */}
       {isReadOnly ? (
-        <div className="rounded-2xl border border-gray-100 p-5">
+        <div className="rounded border border-gray-200 p-5">
           <p className="mb-2 text-xs font-medium text-gray-500">Ваш ответ</p>
           <p className="text-sm font-semibold text-gray-800">
             {task.answer?.answer ?? "Нет ответа"}
@@ -113,7 +113,7 @@ export const Part1TaskCard = ({
           {displayResult && (
             <div
               className={cn(
-                "mt-3 flex items-center gap-2 rounded-xl px-4 py-2.5",
+                "mt-3 flex items-center gap-2 rounded px-4 py-2.5",
                 displayResult === "CORRECT"
                   ? "bg-emerald-50 text-emerald-700"
                   : "bg-red-50 text-red-600",
@@ -136,25 +136,25 @@ export const Part1TaskCard = ({
           )}
 
           {task.correctAnswer && (
-            <div className="mt-3 rounded-xl bg-blue-50 px-4 py-2.5">
-              <p className="text-xs text-blue-500">Правильный ответ</p>
-              <p className="mt-0.5 font-semibold text-blue-800">{task.correctAnswer}</p>
+            <div className="mt-3 rounded bg-gray-50 px-4 py-2.5 border border-gray-200">
+              <p className="text-xs text-gray-500">Правильный ответ</p>
+              <p className="mt-0.5 font-semibold text-gray-800">{task.correctAnswer}</p>
             </div>
           )}
 
           {task.answer?.teacherComment && (
-            <div className="mt-3 rounded-xl bg-amber-50 px-4 py-2.5">
-              <p className="text-xs text-amber-500">Комментарий преподавателя</p>
+            <div className="mt-3 rounded bg-amber-50 border border-amber-200 px-4 py-2.5">
+              <p className="text-xs text-amber-600">Комментарий преподавателя</p>
               <p className="mt-0.5 text-sm text-amber-800">{task.answer.teacherComment}</p>
             </div>
           )}
         </div>
       ) : (
-        <div className="rounded-2xl border border-gray-100 p-5">
+        <div className="rounded border border-gray-200 p-5">
           {isAnswered && (
             <div
               className={cn(
-                "mb-4 flex items-center gap-2 rounded-xl px-4 py-2.5",
+                "mb-4 flex items-center gap-2 rounded px-4 py-2.5",
                 displayResult === "CORRECT"
                   ? "bg-emerald-50 text-emerald-700"
                   : "bg-red-50 text-red-600",
@@ -186,15 +186,15 @@ export const Part1TaskCard = ({
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
               placeholder="Введите ответ"
-              className="h-11 flex-1 rounded-xl border border-gray-200 bg-white px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              className="h-11 flex-1 rounded border border-gray-200 bg-white px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-gray-400 focus:outline-none"
             />
             <button
               onClick={handleSubmit}
               disabled={!inputValue.trim() || saving}
               className={cn(
-                "flex h-11 items-center gap-2 rounded-xl px-5 text-sm font-semibold transition-all",
+                "flex h-11 items-center gap-2 rounded px-5 text-sm font-semibold transition-all",
                 inputValue.trim() && !saving
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  ? "bg-gray-900 text-white hover:bg-gray-800"
                   : "cursor-not-allowed bg-gray-100 text-gray-400",
               )}
             >

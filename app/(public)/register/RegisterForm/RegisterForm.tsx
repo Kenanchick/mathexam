@@ -11,6 +11,7 @@ import {
   Mail,
   User,
   X,
+  Ticket,
 } from "lucide-react";
 
 import { useForm } from "react-hook-form";
@@ -27,6 +28,7 @@ const registerSchema = z
     password: z.string().min(8, "Пароль должен быть минимум 8 символов"),
     confirmPassword: z.string().min(8, "Повторите пароль"),
     role: z.enum(["STUDENT", "TEACHER"]),
+    inviteCode: z.string().trim().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Пароли не совпадают",
@@ -80,6 +82,7 @@ export const RegisterForm = ({ selectedRole }: RegisterFormProps) => {
       password: "",
       confirmPassword: "",
       role: selectedRole,
+      inviteCode: "",
     },
   });
 
@@ -271,6 +274,36 @@ export const RegisterForm = ({ selectedRole }: RegisterFormProps) => {
           <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
         )}
       </div>
+
+      {selectedRole === "STUDENT" && (
+        <div>
+          <label className="mb-2 block text-sm font-medium text-gray-800">
+            Код приглашения <span className="text-gray-400">(необязательно)</span>
+          </label>
+
+          <div className="relative">
+            <Ticket className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Например, ABCD1234"
+              className="h-12 w-full rounded-xl border border-gray-200 bg-white pl-11 pr-4 text-sm font-mono uppercase tracking-wider outline-none transition focus:border-blue-500"
+              {...register("inviteCode", {
+                onChange: (e) => {
+                  e.target.value = e.target.value.toUpperCase();
+                },
+              })}
+            />
+          </div>
+
+          <p className="mt-1 text-xs text-gray-400">
+            Если учитель дал вам код класса или личный код — введите его, и вы автоматически попадёте к нему
+          </p>
+
+          {errors.inviteCode && (
+            <p className="mt-1 text-sm text-red-600">{errors.inviteCode.message}</p>
+          )}
+        </div>
+      )}
 
       <div>
         <label className="mb-2 block text-sm font-medium text-gray-800">

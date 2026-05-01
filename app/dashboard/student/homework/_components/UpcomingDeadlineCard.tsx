@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { DeadlineEntry } from "../_lib/getHomeworkData";
 
@@ -35,7 +35,7 @@ function buildMonthTitle(year: number, month: number): string {
 function formatDeadlineDate(isoString: string): string {
   return new Intl.DateTimeFormat("ru-RU", {
     day: "numeric",
-    month: "long",
+    month: "short",
   }).format(new Date(isoString));
 }
 
@@ -43,7 +43,9 @@ interface UpcomingDeadlineCardProps {
   deadlines: DeadlineEntry[];
 }
 
-export const UpcomingDeadlineCard = ({ deadlines }: UpcomingDeadlineCardProps) => {
+export const UpcomingDeadlineCard = ({
+  deadlines,
+}: UpcomingDeadlineCardProps) => {
   const now = new Date();
   const [viewYear, setViewYear] = useState(now.getFullYear());
   const [viewMonth, setViewMonth] = useState(now.getMonth());
@@ -83,9 +85,12 @@ export const UpcomingDeadlineCard = ({ deadlines }: UpcomingDeadlineCardProps) =
         const d = new Date(e.deadlineIso);
         return d > now && d.getTime() - now.getTime() <= fourteenDaysMs;
       })
-      .sort((a, b) => new Date(a.deadlineIso).getTime() - new Date(b.deadlineIso).getTime())
+      .sort(
+        (a, b) =>
+          new Date(a.deadlineIso).getTime() - new Date(b.deadlineIso).getTime(),
+      )
       .slice(0, 5);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deadlines]);
 
   const prevMonth = () => {
@@ -109,132 +114,132 @@ export const UpcomingDeadlineCard = ({ deadlines }: UpcomingDeadlineCardProps) =
   };
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-      <h3 className="mb-4 text-sm font-semibold text-gray-900">
-        Ближайший дедлайн
-      </h3>
-
-      {/* Calendar */}
-      <div className="mb-4">
-        <div className="mb-3 flex items-center justify-between">
-          <button
-            onClick={prevMonth}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <span className="text-sm font-semibold text-gray-800">
-            {monthTitle}
-          </span>
-          <button
-            onClick={nextMonth}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-7 gap-y-1">
-          {DAYS.map((d) => (
-            <div
-              key={d}
-              className="py-1 text-center text-[11px] font-medium text-gray-400"
-            >
-              {d}
-            </div>
-          ))}
-
-          {rows.flat().map((day, i) => {
-            const hasDeadline = day !== null && !!deadlinesByDay[day];
-            const isToday = isCurrentMonth && day === today;
-            const titles = day !== null ? (deadlinesByDay[day] ?? []) : [];
-
-            return (
-              <div key={i} className="relative flex flex-col items-center py-0.5">
-                {day ? (
-                  <>
-                    <button
-                      className={cn(
-                        "relative flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium transition-colors",
-                        isToday
-                          ? "animate-pulse bg-blue-600 text-white shadow-md shadow-blue-200 ring-2 ring-blue-300 ring-offset-1"
-                          : hasDeadline
-                            ? "font-semibold text-blue-600 hover:bg-blue-50"
-                            : "text-gray-700 hover:bg-gray-100",
-                      )}
-                      onMouseEnter={() => setHoveredDay(day)}
-                      onMouseLeave={() => setHoveredDay(null)}
-                    >
-                      {day}
-                      {hasDeadline && !isToday && (
-                        <span className="absolute -bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-blue-500" />
-                      )}
-                    </button>
-
-                    {hoveredDay === day && titles.length > 0 && (
-                      <div className="absolute bottom-full left-1/2 z-50 mb-2 w-max max-w-[200px] -translate-x-1/2 rounded-xl bg-gray-900 px-3 py-2 shadow-xl">
-                        {titles.map((title, idx) => (
-                          <p
-                            key={idx}
-                            className="text-[11px] leading-snug text-white"
-                          >
-                            {title}
-                          </p>
-                        ))}
-                        <div className="absolute top-full left-1/2 h-0 w-0 -translate-x-1/2 border-x-[5px] border-t-[5px] border-x-transparent border-t-gray-900" />
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <span className="h-7 w-7" />
-                )}
-              </div>
-            );
-          })}
-        </div>
+    <div className="rounded border border-gray-200 bg-white">
+      <div className="border-b border-gray-200 bg-gray-50 px-5 py-3">
+        <h3 className="text-[16px] font-semibold text-gray-900">
+          Ближайший дедлайн
+        </h3>
       </div>
 
-      {/* Upcoming list */}
-      {upcomingDeadlines.length > 0 ? (
-        <>
-          <p className="mb-3 text-xs font-medium text-gray-500">
-            {upcomingDeadlines.length}{" "}
-            {upcomingDeadlines.length === 1 ? "задание" : "задания"} на
-            ближайших 2 недели
-          </p>
+      <div className="p-5">
+        {/* Calendar */}
+        <div className="mb-4">
+          <div className="mb-3 flex items-center justify-between">
+            <button
+              onClick={prevMonth}
+              className="flex h-7 w-7 items-center justify-center rounded text-gray-400 transition hover:bg-gray-100"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <span className="text-[15px] font-semibold text-gray-800">
+              {monthTitle}
+            </span>
+            <button
+              onClick={nextMonth}
+              className="flex h-7 w-7 items-center justify-center rounded text-gray-400 transition hover:bg-gray-100"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
 
-          <ul className="mb-4 space-y-2.5">
-            {upcomingDeadlines.map((entry, idx) => (
-              <li
-                key={entry.deadlineIso + entry.title}
-                className="flex items-start justify-between gap-2"
+          <div className="grid grid-cols-7 gap-y-1">
+            {DAYS.map((d) => (
+              <div
+                key={d}
+                className="py-1 text-center text-[12px] font-medium text-gray-400"
               >
-                <div className="flex items-start gap-2">
-                  <span
-                    className={cn(
-                      "mt-1.5 h-2 w-2 shrink-0 rounded-full",
-                      idx === 0 ? "bg-amber-400" : "bg-blue-500",
-                    )}
-                  />
-                  <span className="text-xs leading-snug text-gray-700">
-                    {entry.title}
-                  </span>
-                </div>
-                <span className="shrink-0 text-xs text-gray-400">
-                  {formatDeadlineDate(entry.deadlineIso)}
-                </span>
-              </li>
+                {d}
+              </div>
             ))}
-          </ul>
-        </>
-      ) : (
-        <p className="mb-4 text-xs text-gray-400">Ближайших дедлайнов нет</p>
-      )}
 
-      <button className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-gray-100 bg-gray-50 py-2.5 text-xs font-semibold text-gray-700 transition-all hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600">
-        Смотреть все дедлайны
-        <ArrowRight className="h-3.5 w-3.5" />
-      </button>
+            {rows.flat().map((day, i) => {
+              const hasDeadline = day !== null && !!deadlinesByDay[day];
+              const isToday = isCurrentMonth && day === today;
+              const titles = day !== null ? (deadlinesByDay[day] ?? []) : [];
+
+              return (
+                <div
+                  key={i}
+                  className="relative flex flex-col items-center py-0.5"
+                >
+                  {day ? (
+                    <>
+                      <button
+                        className={cn(
+                          "relative flex h-7 w-7 items-center justify-center rounded-full text-[13px] font-medium transition-colors",
+                          isToday
+                            ? "bg-blue-600 text-white"
+                            : hasDeadline
+                              ? "font-semibold text-blue-600 hover:bg-blue-50"
+                              : "text-gray-700 hover:bg-gray-100",
+                        )}
+                        onMouseEnter={() => setHoveredDay(day)}
+                        onMouseLeave={() => setHoveredDay(null)}
+                      >
+                        {day}
+                        {hasDeadline && !isToday && (
+                          <span className="absolute -bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-blue-500" />
+                        )}
+                      </button>
+
+                      {hoveredDay === day && titles.length > 0 && (
+                        <div className="absolute bottom-full left-1/2 z-50 mb-2 w-max max-w-[200px] -translate-x-1/2 rounded border border-gray-200 bg-white px-3 py-2 shadow-lg">
+                          {titles.map((title, idx) => (
+                            <p
+                              key={idx}
+                              className="text-[12px] leading-snug text-gray-700"
+                            >
+                              {title}
+                            </p>
+                          ))}
+                          <div className="absolute top-full left-1/2 h-0 w-0 -translate-x-1/2 border-x-[5px] border-t-[5px] border-x-transparent border-t-gray-200" />
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <span className="h-7 w-7" />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Upcoming list — only shown if there are active (non-submitted) deadlines */}
+        {upcomingDeadlines.length > 0 && (
+          <>
+            <p className="mb-3 text-[13px] font-medium text-gray-500">
+              {upcomingDeadlines.length}{" "}
+              {upcomingDeadlines.length === 1 ? "задание" : "задания"} на
+              ближайших 2 недели
+            </p>
+
+            <ul className="space-y-2.5">
+              {upcomingDeadlines.map((entry, idx) => (
+                <li
+                  key={entry.deadlineIso + entry.title}
+                  className="flex items-start justify-between gap-2"
+                >
+                  <div className="flex items-start gap-2">
+                    <span
+                      className={cn(
+                        "mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full",
+                        idx === 0 ? "bg-amber-400" : "bg-blue-500",
+                      )}
+                    />
+                    <span className="text-[14px] leading-snug text-gray-700">
+                      {entry.title}
+                    </span>
+                  </div>
+                  <span className="shrink-0 text-[13px] text-gray-400">
+                    {formatDeadlineDate(entry.deadlineIso)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </div>
     </div>
   );
 };

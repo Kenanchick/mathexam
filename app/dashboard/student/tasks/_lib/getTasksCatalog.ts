@@ -96,6 +96,12 @@ export async function getTasksCatalog(
           slug: true,
         },
       },
+      subtopic: {
+        select: {
+          title: true,
+          slug: true,
+        },
+      },
       attempts: {
         where: {
           studentId,
@@ -115,9 +121,9 @@ export async function getTasksCatalog(
     return {
       id: task.id,
       number: task.examNumber,
-      title: task.title ?? `Задание ${task.examNumber}`,
-      topic: task.topic.title,
-      topicSlug: task.topic.slug,
+      title: task.topic.title,
+      topic: task.subtopic?.title ?? task.topic.title,
+      topicSlug: task.subtopic?.slug ?? task.topic.slug,
       difficulty: task.difficulty,
       difficultyLabel: getDifficultyLabel(task.difficulty),
       condition: task.condition,

@@ -40,9 +40,12 @@ function getRecipientCount(
   state: HomeworkFormState,
   data: CreateHomeworkPageData,
 ): number {
+  if (state.recipientMode === "personal") {
+    return state.selectedStudentIds.length;
+  }
   const classroom = data.classrooms.find((c) => c.id === state.classroomId);
   if (!classroom) return 0;
-  if (state.recipientMode === "all" || state.recipientMode === "individual") {
+  if (state.recipientMode === "all") {
     return classroom.students.length;
   }
   return state.selectedStudentIds.length;
@@ -54,13 +57,24 @@ function getWarnings(
   recipientCount: number,
 ): string[] {
   const warnings: string[] = [];
-  if (!state.classroomId) warnings.push("Выберите класс");
+  if (state.recipientMode !== "personal" && !state.classroomId) {
+    warnings.push("Выберите класс");
+  }
   if (!state.deadlineDate || !state.deadlineTime) warnings.push("Укажите дедлайн");
   if (taskCount === 0) warnings.push("Добавьте хотя бы одну задачу");
-  if (state.recipientMode === "selected" && state.selectedStudentIds.length === 0) {
+  if (
+    (state.recipientMode === "selected" || state.recipientMode === "personal") &&
+    state.selectedStudentIds.length === 0
+  ) {
     warnings.push("Выберите учеников");
   }
-  if (recipientCount === 0 && state.classroomId) warnings.push("В классе нет учеников");
+  if (
+    state.recipientMode !== "personal" &&
+    recipientCount === 0 &&
+    state.classroomId
+  ) {
+    warnings.push("В классе нет учеников");
+  }
   return warnings;
 }
 
@@ -177,7 +191,7 @@ export const CreateHomeworkContainer = ({
       setServerError("Введите название домашнего задания");
       return;
     }
-    if (!state.classroomId) {
+    if (state.recipientMode !== "personal" && !state.classroomId) {
       setServerError("Выберите класс");
       return;
     }
@@ -193,7 +207,8 @@ export const CreateHomeworkContainer = ({
     const result = await createHomework({
       title: state.title.trim(),
       description: state.description || undefined,
-      classroomId: state.classroomId,
+      classroomId:
+        state.recipientMode === "personal" ? undefined : state.classroomId,
       deadlineAt,
       status,
       recipientMode: state.recipientMode,
@@ -210,7 +225,7 @@ export const CreateHomeworkContainer = ({
     }
 
     if (result.status === "PUBLISHED") {
-      router.push("/dashboard/teacher/classes");
+      router.push("/dashboard/teacher/homework");
     } else {
       router.push("/dashboard/teacher");
     }
@@ -271,9 +286,13 @@ export const CreateHomeworkContainer = ({
           <HomeworkRecipients
             classroomId={state.classroomId}
             classrooms={data.classrooms}
+            allStudents={data.allStudents}
             mode={state.recipientMode}
             selectedStudentIds={state.selectedStudentIds}
-            onModeChange={(m) => update("recipientMode", m)}
+            onModeChange={(m) => {
+              update("recipientMode", m);
+              update("selectedStudentIds", []);
+            }}
             onStudentToggle={handleStudentToggle}
             onSelectAll={handleSelectAll}
             onDeselectAll={handleDeselectAll}

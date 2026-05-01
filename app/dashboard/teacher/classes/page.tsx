@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { isAuthError, requireRole } from "@/lib/auth/server";
+import { prisma } from "@/lib/prisma";
 import { getTeacherClassesData } from "./_lib/getTeacherClassesData";
 import { TeacherClassesPage } from "./_components/TeacherClassesPage";
 
@@ -15,7 +16,20 @@ export default async function TeacherClassesRoute() {
     throw error;
   }
 
-  const classes = await getTeacherClassesData(user.id);
+  const [classes, directLinks] = await Promise.all([
+    getTeacherClassesData(user.id),
+    prisma.teacherStudent.findMany({
+      where: { teacherId: user.id, status: "ACTIVE" },
+      orderBy: { joinedAt: "desc" },
+      select: {
+        student: { select: { id: true, name: true, email: true } },
+      },
+    }),
+  ]);
 
-  return <TeacherClassesPage classes={classes} />;
+  const personalStudents = directLinks.map((l) => l.student);
+
+  return (
+    <TeacherClassesPage classes={classes} personalStudents={personalStudents} />
+  );
 }

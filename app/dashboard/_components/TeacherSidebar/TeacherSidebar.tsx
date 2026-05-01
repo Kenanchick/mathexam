@@ -53,8 +53,8 @@ export const TeacherSidebar = () => {
     <Sidebar>
       <SidebarHeader className="px-5 py-5">
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white">
-            <GraduationCap className="h-5 w-5" />
+          <div className="flex h-9 w-9 items-center justify-center rounded border border-gray-300 bg-white">
+            <GraduationCap className="h-5 w-5 text-gray-800" />
           </div>
           <span className="text-xl font-bold text-gray-900">MathExam</span>
         </Link>
@@ -71,7 +71,7 @@ export const TeacherSidebar = () => {
                 <SidebarMenuButton
                   asChild
                   isActive={active}
-                  className="h-11 rounded-xl px-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600 data-active:bg-blue-50 data-active:font-semibold data-active:text-blue-600"
+                  className="h-11 rounded-xl px-3 text-gray-600 hover:bg-gray-100 hover:text-gray-900 data-active:bg-gray-100 data-active:font-semibold data-active:text-gray-900"
                 >
                   <Link href={item.href}>
                     <Icon className="h-5 w-5 shrink-0" />
@@ -87,7 +87,7 @@ export const TeacherSidebar = () => {
       <SidebarFooter className="px-5 pb-5">
         <Link
           href="#"
-          className="flex items-center gap-2 text-sm text-gray-500 transition-colors hover:text-blue-600"
+          className="flex items-center gap-2 text-sm text-gray-500 transition-colors hover:text-gray-900"
         >
           <HelpCircle className="h-4 w-4" />
           Помощь и поддержка

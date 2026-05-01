@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { HomeworkTabs } from "./HomeworkTabs";
 import { HomeworkTable } from "./HomeworkTable";
@@ -39,28 +38,19 @@ export const HomeworkPage = ({ data }: HomeworkPageProps) => {
   }, [data.items, activeTab, search]);
 
   return (
-    <div>
-      <motion.div
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.25 }}
-        className="mb-6"
-      >
-        <h1 className="text-2xl font-bold text-gray-900">Домашние задания</h1>
-        <p className="mt-1 text-sm text-gray-500">
+    <div className="w-full">
+      <div className="mb-4">
+        <h1 className="text-[24px] font-semibold leading-tight text-gray-900">
+          Домашние задания
+        </h1>
+        <p className="mt-1 text-[16px] text-gray-500">
           Все задания от преподавателей в одном месте
         </p>
-      </motion.div>
+      </div>
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_304px]">
-        {/* Left column */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.28, delay: 0.05 }}
-          className="space-y-4"
-        >
-          <div className="rounded-2xl border border-gray-100 bg-white px-2 shadow-sm">
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_296px]">
+        <div className="space-y-3">
+          <div className="rounded border border-gray-200 bg-white px-2">
             <HomeworkTabs
               activeTab={activeTab}
               counts={counts}
@@ -69,29 +59,23 @@ export const HomeworkPage = ({ data }: HomeworkPageProps) => {
           </div>
 
           <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Поиск по названию или учителю"
-              className="h-11 w-full rounded-xl border border-gray-200 bg-white pl-10 pr-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              className="h-10 w-full rounded border border-gray-200 bg-white pl-10 pr-4 text-[15px] text-gray-800 placeholder:text-gray-400 outline-none transition focus:border-gray-400"
             />
           </div>
 
           <HomeworkTable items={filteredItems} />
-        </motion.div>
+        </div>
 
-        {/* Right column */}
-        <motion.div
-          initial={{ opacity: 0, x: 12 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.28, delay: 0.1 }}
-          className="space-y-4"
-        >
+        <div className="space-y-4">
           <UpcomingDeadlineCard deadlines={data.deadlines} />
           <HomeworkStatsCard stats={data.stats} />
-        </motion.div>
+        </div>
       </div>
     </div>
   );

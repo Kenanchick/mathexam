@@ -1,8 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { MathText } from "@/components/MathText";
 
 type CheckAnswerResponse = {
   message?: string;
@@ -19,6 +22,7 @@ type SolutionResponse = {
   message?: string;
   solution?: string | null;
   hints?: string[];
+  solutionImageUrls?: string[];
 };
 
 export const AnswerCard = ({ taskId }: { taskId: string }) => {
@@ -31,6 +35,7 @@ export const AnswerCard = ({ taskId }: { taskId: string }) => {
 
   const [solution, setSolution] = useState<string | null>(null);
   const [hints, setHints] = useState<string[]>([]);
+  const [solutionImageUrls, setSolutionImageUrls] = useState<string[]>([]);
   const [solutionMessage, setSolutionMessage] = useState("");
   const [isSolutionLoading, setIsSolutionLoading] = useState(false);
   const [isSolutionVisible, setIsSolutionVisible] = useState(false);
@@ -96,7 +101,7 @@ export const AnswerCard = ({ taskId }: { taskId: string }) => {
       return;
     }
 
-    if (solution || solutionMessage) {
+    if (solution || solutionImageUrls.length > 0 || solutionMessage) {
       setIsSolutionVisible(true);
       return;
     }
@@ -130,6 +135,7 @@ export const AnswerCard = ({ taskId }: { taskId: string }) => {
 
       setSolution(result.solution ?? null);
       setHints(result.hints ?? []);
+      setSolutionImageUrls(result.solutionImageUrls ?? []);
       setSolutionMessage(result.message || "");
       setIsSolutionVisible(true);
     } catch {
@@ -197,42 +203,82 @@ export const AnswerCard = ({ taskId }: { taskId: string }) => {
         </button>
       </div>
 
-      {isSolutionVisible && (
-        <div className="mt-5 rounded-2xl border border-blue-100 bg-blue-50/50 p-5">
-          <h3 className="mb-3 text-base font-bold text-gray-900">
-            Разбор решения
-          </h3>
+      <AnimatePresence initial={false}>
+        {isSolutionVisible && (
+          <motion.div
+            key="solution"
+            initial={{ height: 0, opacity: 0, marginTop: 0 }}
+            animate={{ height: "auto", opacity: 1, marginTop: 20 }}
+            exit={{ height: 0, opacity: 0, marginTop: 0 }}
+            transition={{
+              duration: 0.32,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            className="overflow-hidden"
+          >
+            <div className="rounded-2xl border border-gray-200 bg-gray-50 p-5">
+              <h3 className="mb-3 text-base font-bold text-gray-900">
+                Разбор решения
+              </h3>
 
-          {solution ? (
-            <p className="whitespace-pre-line text-sm leading-7 text-gray-700">
-              {solution}
-            </p>
-          ) : (
-            <p className="text-sm leading-7 text-gray-600">
-              {solutionMessage || "Для этой задачи пока нет разбора решения."}
-            </p>
-          )}
+              {solution && (
+                <MathText
+                  text={solution}
+                  className="block text-sm leading-7 text-gray-700"
+                />
+              )}
 
-          {hints.length > 0 && (
-            <div className="mt-5">
-              <h4 className="mb-2 text-sm font-bold text-gray-900">
-                Подсказки
-              </h4>
+              {solutionImageUrls.length > 0 && (
+                <div
+                  className={`flex flex-col gap-3 ${solution ? "mt-4" : ""}`}
+                >
+                  {solutionImageUrls.map((src, index) => (
+                    <div
+                      key={src}
+                      className="overflow-hidden rounded-xl border border-gray-200 bg-white"
+                    >
+                      <Image
+                        src={src}
+                        alt={`Решение, рисунок ${index + 1}`}
+                        width={960}
+                        height={540}
+                        className="max-h-[420px] w-full object-contain"
+                        unoptimized
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
 
-              <ul className="space-y-2 text-sm text-gray-700">
-                {hints.map((hint, index) => (
-                  <li key={hint} className="flex gap-2">
-                    <span className="font-semibold text-blue-600">
-                      {index + 1}.
-                    </span>
-                    <span>{hint}</span>
-                  </li>
-                ))}
-              </ul>
+              {!solution && solutionImageUrls.length === 0 && (
+                <p className="text-sm leading-7 text-gray-600">
+                  {solutionMessage ||
+                    "Для этой задачи пока нет разбора решения."}
+                </p>
+              )}
+
+              {hints.length > 0 && (
+                <div className="mt-5">
+                  <h4 className="mb-2 text-sm font-bold text-gray-900">
+                    Подсказки
+                  </h4>
+
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    {hints.map((hint, index) => (
+                      <li key={hint} className="flex gap-2">
+                        <span className="font-semibold text-gray-700">
+                          {index + 1}.
+                        </span>
+                        <MathText text={hint} />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertCircle, Bookmark, CheckCircle2, Circle } from "lucide-react";
+import { CheckCircle2, Circle, AlertCircle } from "lucide-react";
 import type {
   CatalogTaskProgressStatus,
   CatalogTaskView,
@@ -9,22 +9,16 @@ type TaskCardProps = {
   task: CatalogTaskView;
 };
 
-const difficultyStyles = {
-  EASY: "bg-emerald-50 text-emerald-700",
-  MEDIUM: "bg-yellow-100 text-yellow-800",
-  HARD: "bg-red-50 text-red-600",
-};
-
 const statusLabels: Record<CatalogTaskProgressStatus, string> = {
   solved: "Решено",
   unsolved: "Не решено",
-  error: "С ошибками",
+  error: "Не решено",
 };
 
 const statusStyles: Record<CatalogTaskProgressStatus, string> = {
   solved: "text-emerald-600",
-  unsolved: "text-gray-500",
-  error: "text-red-500",
+  unsolved: "text-gray-400",
+  error: "text-gray-400",
 };
 
 const statusIcons = {
@@ -33,62 +27,41 @@ const statusIcons = {
   error: AlertCircle,
 };
 
-function getAttemptLabel(count: number) {
-  if (count === 1) return "1 попытка";
-  if (count >= 2 && count <= 4) return `${count} попытки`;
-  return `${count} попыток`;
-}
-
 export const TaskCard = ({ task }: TaskCardProps) => {
   const StatusIcon = statusIcons[task.status];
 
   return (
-    <article className="grid min-h-[118px] grid-cols-[170px_1fr_130px_140px] items-center rounded-2xl border border-gray-200 bg-white px-6 py-5 shadow-sm transition hover:border-blue-200 hover:shadow-md">
-      <div>
-        <h2 className="text-xl font-bold text-gray-950">{task.title}</h2>
-        <p className="mt-1 text-sm text-gray-500">{task.topic}</p>
-
-        <span
-          className={`mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-            difficultyStyles[task.difficulty]
-          }`}
-        >
-          {task.difficultyLabel}
-        </span>
+    <article className="grid min-h-[100px] grid-cols-[190px_1fr_130px_108px] items-stretch rounded border border-gray-200 bg-white transition hover:bg-gray-50/60">
+      <div className="flex flex-col justify-center px-5 py-4">
+        <p className="mb-1 text-[12px] font-medium uppercase tracking-wide text-gray-400">
+          Задание {task.number}
+        </p>
+        <h2 className="text-[17px] font-semibold text-gray-900">
+          {task.title}
+        </h2>
+        <p className="mt-0.5 text-[14px] text-gray-500">{task.topic}</p>
       </div>
 
-      <div className="border-l border-gray-200 pl-7 pr-6">
-        <p className="line-clamp-3 text-[15px] leading-relaxed text-gray-700">
+      <div className="flex items-center border-l border-gray-200 py-4 pl-5 pr-4">
+        <p className="line-clamp-3 text-[16px] leading-relaxed text-gray-600">
           {task.condition}
         </p>
       </div>
 
-      <div>
-        <div
-          className={`flex items-center gap-2 text-sm font-medium ${
-            statusStyles[task.status]
-          }`}
-        >
-          <StatusIcon className="h-5 w-5" />
-          {statusLabels[task.status]}
-        </div>
+      <div className="flex min-w-[120px] items-center gap-2">
+        <StatusIcon className="h-4 w-4 shrink-0" />
 
-        <p className="mt-5 text-sm text-gray-500">
-          {getAttemptLabel(task.attempts)}
-        </p>
+        <span
+          className={`whitespace-nowrap text-[15px] font-medium ${statusStyles[task.status]}`}
+        >
+          {statusLabels[task.status]}
+        </span>
       </div>
 
-      <div className="flex items-center justify-end gap-4">
-        <button
-          type="button"
-          className="text-gray-400 transition hover:text-blue-600"
-        >
-          <Bookmark className="h-6 w-6" />
-        </button>
-
+      <div className="flex items-center justify-end px-4 py-4">
         <Link
           href={`/dashboard/student/tasks/${task.id}`}
-          className="flex h-11 w-[100px] items-center justify-center rounded-lg bg-blue-600 text-sm font-semibold text-white transition hover:bg-blue-700"
+          className="flex h-9 w-[84px] items-center justify-center rounded border border-gray-300 text-[14px] font-medium text-gray-900 transition hover:bg-gray-100"
         >
           Решить
         </Link>

@@ -15,7 +15,8 @@ export type TaskDetailView = {
   difficultyLabel: string;
   averageTime: string;
   condition: string;
-  imageUrl: string | null;
+  imageUrls: string[];
+  solutionImageUrls: string[];
   attempts: {
     id: string;
     title: string;
@@ -84,6 +85,8 @@ export async function getTaskDetail(taskId: string, studentId: string) {
       title: true,
       condition: true,
       imageUrl: true,
+      imageUrls: true,
+      solutionImageUrls: true,
       difficulty: true,
       solveTimeSec: true,
       topicId: true,
@@ -155,7 +158,13 @@ export async function getTaskDetail(taskId: string, studentId: string) {
     difficultyLabel: getDifficultyLabel(task.difficulty),
     averageTime: formatSolveTime(task.solveTimeSec),
     condition: task.condition,
-    imageUrl: task.imageUrl,
+    imageUrls:
+      task.imageUrls.length > 0
+        ? task.imageUrls
+        : task.imageUrl
+          ? [task.imageUrl]
+          : [],
+    solutionImageUrls: task.solutionImageUrls,
     attempts: task.attempts.map((attempt, index) => ({
       id: attempt.id,
       title: `Попытка ${task.attempts.length - index}`,

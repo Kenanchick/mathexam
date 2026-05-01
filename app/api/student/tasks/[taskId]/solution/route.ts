@@ -23,6 +23,7 @@ export async function GET(
         id: true,
         solution: true,
         hints: true,
+        solutionImageUrls: true,
       },
     });
 
@@ -33,22 +34,17 @@ export async function GET(
       );
     }
 
-    if (!task.solution) {
-      return NextResponse.json(
-        {
-          message: "Для этой задачи пока нет разбора решения",
-          solution: null,
-          hints: task.hints,
-        },
-        { status: 200 },
-      );
-    }
+    const hasSolutionContent =
+      Boolean(task.solution) || task.solutionImageUrls.length > 0;
 
     return NextResponse.json(
       {
-        message: "Решение загружено",
+        message: hasSolutionContent
+          ? "Решение загружено"
+          : "Для этой задачи пока нет разбора решения",
         solution: task.solution,
         hints: task.hints,
+        solutionImageUrls: task.solutionImageUrls,
       },
       { status: 200 },
     );

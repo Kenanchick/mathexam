@@ -40,7 +40,7 @@ export const ClassCard = ({ cls, index }: ClassCardProps) => {
         </div>
 
         {cls.pendingReviews > 0 && (
-          <span className="shrink-0 rounded-lg bg-orange-50 px-2.5 py-1 text-xs font-semibold text-orange-600">
+          <span className="shrink-0 rounded-lg border border-gray-700 px-2.5 py-1 text-xs font-semibold text-gray-700">
             {cls.pendingReviews} на проверке
           </span>
         )}
@@ -55,7 +55,7 @@ export const ClassCard = ({ cls, index }: ClassCardProps) => {
         </div>
         <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
           <motion.div
-            className="h-full rounded-full bg-blue-500"
+            className="h-full rounded-full bg-gray-700"
             initial={{ width: 0 }}
             animate={{ width: `${cls.avgProgress}%` }}
             transition={{ duration: 0.7, delay: 0.3 + index * 0.1, ease: "easeOut" }}
@@ -116,7 +116,7 @@ export const ClassCard = ({ cls, index }: ClassCardProps) => {
       <div className="mt-4 border-t border-gray-100 pt-4">
         <Link
           href={`/dashboard/teacher/classes/${cls.id}`}
-          className="flex items-center gap-1.5 text-sm font-medium text-blue-600 transition-colors hover:text-blue-700"
+          className="flex items-center gap-1.5 text-base font-medium text-gray-700 transition-colors hover:text-gray-900"
         >
           Открыть класс
           <ArrowRight className="h-4 w-4" />

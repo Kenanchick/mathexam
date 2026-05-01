@@ -8,7 +8,7 @@ import type { TaskSource } from "./HomeworkTaskSourceSelector";
 const RECIPIENT_MODE_LABEL: Record<RecipientMode, string> = {
   all: "Весь класс",
   selected: "Выбранные ученики",
-  individual: "Индивидуальные наборы",
+  personal: "Лично выбранным",
 };
 
 const TASK_SOURCE_LABEL: Record<TaskSource, string> = {
@@ -83,7 +83,9 @@ export const HomeworkSummary = ({
             <p className="text-xs text-gray-400">Класс</p>
             <p className="text-sm font-medium text-gray-800">
               {classroomName ?? (
-                <span className="text-gray-300">не выбран</span>
+                <span className="text-gray-300">
+                  {recipientMode === "personal" ? "без класса" : "не выбран"}
+                </span>
               )}
             </p>
           </div>
@@ -133,9 +135,9 @@ export const HomeworkSummary = ({
       </div>
 
       {warnings.length > 0 && (
-        <div className="mt-5 space-y-1.5 rounded-xl bg-orange-50 p-3">
+        <div className="mt-5 space-y-1.5 rounded-xl border border-gray-300 bg-gray-50 p-3">
           {warnings.map((w) => (
-            <div key={w} className="flex items-center gap-2 text-xs text-orange-700">
+            <div key={w} className="flex items-center gap-2 text-xs text-gray-700">
               <AlertCircle className="h-3.5 w-3.5 shrink-0" />
               {w}
             </div>
@@ -148,7 +150,7 @@ export const HomeworkSummary = ({
           type="button"
           onClick={onPublish}
           disabled={!canPublish || isSaving}
-          className="w-full rounded-xl bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+          className="w-full rounded-xl bg-gray-900 text-white hover:bg-gray-800 disabled:opacity-50"
         >
           {isSaving ? "Публикация..." : "Опубликовать"}
         </Button>

@@ -12,6 +12,7 @@ import {
   normalizeVerificationCode,
   verifyCodeHash,
 } from "@/lib/auth/verification-code";
+import { applyInviteCode } from "@/lib/auth/invite-code";
 
 const verifyEmailSchema = z.object({
   email: z.string().trim().toLowerCase().email("Введите корректный email"),
@@ -150,6 +151,16 @@ export async function POST(req: Request) {
         { message: "Пользователь с таким email уже существует" },
         { status: 409 },
       );
+    }
+
+    // Apply invite code if present (links student to class or teacher)
+    if (verification.inviteCode && user.user.role === "STUDENT") {
+      try {
+        await applyInviteCode(user.user.id, verification.inviteCode);
+      } catch (err) {
+        console.error("APPLY_INVITE_CODE_ERROR:", err);
+        // Don't fail registration — student is still registered, just without auto-link
+      }
     }
 
     const token = await signSessionToken({

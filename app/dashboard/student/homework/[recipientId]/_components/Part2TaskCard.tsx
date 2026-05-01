@@ -133,10 +133,10 @@ export const Part2TaskCard = ({
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
           <div className="mb-1.5 flex flex-wrap items-center gap-2">
-            <span className="rounded-lg bg-purple-50 px-2.5 py-0.5 text-xs font-semibold text-purple-700">
+            <span className="rounded bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
               Задание {task.examNumber}
             </span>
-            <span className="rounded-lg bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-500">
+            <span className="rounded bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-500">
               Часть 2 · Развёрнутый ответ
             </span>
             <span className="text-xs text-gray-400">{task.points} б.</span>
@@ -149,7 +149,7 @@ export const Part2TaskCard = ({
           <button
             onClick={onPrev}
             disabled={taskIndex === 0}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition hover:border-gray-300 hover:text-gray-600 disabled:opacity-40"
+            className="flex h-8 w-8 items-center justify-center rounded border border-gray-200 text-gray-400 transition hover:border-gray-300 hover:text-gray-600 disabled:opacity-40"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -159,7 +159,7 @@ export const Part2TaskCard = ({
           <button
             onClick={onNext}
             disabled={taskIndex === totalTasks - 1}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition hover:border-gray-300 hover:text-gray-600 disabled:opacity-40"
+            className="flex h-8 w-8 items-center justify-center rounded border border-gray-200 text-gray-400 transition hover:border-gray-300 hover:text-gray-600 disabled:opacity-40"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -168,7 +168,7 @@ export const Part2TaskCard = ({
 
       {/* Task image */}
       {task.imageUrl && (
-        <div className="mb-5 overflow-hidden rounded-xl border border-gray-200">
+        <div className="mb-5 overflow-hidden rounded border border-gray-200">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={task.imageUrl}
@@ -179,7 +179,7 @@ export const Part2TaskCard = ({
       )}
 
       {/* Task condition */}
-      <div className="mb-6 flex-1 rounded-2xl border border-gray-200 bg-gray-50 p-5">
+      <div className="mb-6 flex-1 rounded border border-gray-200 bg-gray-50 p-5">
         <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-800">
           {task.condition}
         </p>
@@ -187,10 +187,10 @@ export const Part2TaskCard = ({
 
       {/* Answer / result block */}
       {isReadOnly ? (
-        <div className="space-y-3 rounded-2xl border border-gray-100 p-5">
+        <div className="space-y-3 rounded border border-gray-200 p-5">
           {/* Status */}
           {result === "CORRECT" || result === "PARTIAL" ? (
-            <div className="flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-2.5">
+            <div className="flex items-center gap-2 rounded bg-emerald-50 px-4 py-2.5">
               <CheckCircle2 className="h-4 w-4 text-emerald-600" />
               <span className="text-sm font-semibold text-emerald-700">
                 Проверено преподавателем
@@ -202,13 +202,13 @@ export const Part2TaskCard = ({
               )}
             </div>
           ) : result === "WRONG" ? (
-            <div className="flex items-center gap-2 rounded-xl bg-red-50 px-4 py-2.5">
+            <div className="flex items-center gap-2 rounded bg-red-50 px-4 py-2.5">
               <span className="text-sm font-semibold text-red-600">
                 Оценка: 0 / {task.points} б.
               </span>
             </div>
           ) : (
-            <div className="flex items-center gap-2 rounded-xl bg-amber-50 px-4 py-2.5">
+            <div className="flex items-center gap-2 rounded bg-amber-50 px-4 py-2.5">
               <Clock className="h-4 w-4 text-amber-500" />
               <span className="text-sm font-semibold text-amber-700">
                 Ожидает проверки преподавателем
@@ -220,7 +220,7 @@ export const Part2TaskCard = ({
           {existingUrls.map((url, i) => (
             <div
               key={i}
-              className="flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2.5"
+              className="flex items-center gap-2 rounded border border-gray-200 px-4 py-2.5"
             >
               <File className="h-4 w-4 shrink-0 text-gray-400" />
               <span className="flex-1 truncate text-sm text-gray-600">
@@ -230,7 +230,7 @@ export const Part2TaskCard = ({
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline"
+                className="flex items-center gap-1 text-xs font-medium text-gray-600 hover:underline"
               >
                 <ExternalLink className="h-3 w-3" />
                 Открыть
@@ -248,8 +248,8 @@ export const Part2TaskCard = ({
 
           {/* Teacher comment */}
           {task.answer?.teacherComment && (
-            <div className="rounded-xl bg-amber-50 px-4 py-2.5">
-              <p className="text-xs text-amber-500">Комментарий преподавателя</p>
+            <div className="rounded border border-amber-200 bg-amber-50 px-4 py-2.5">
+              <p className="text-xs text-amber-600">Комментарий преподавателя</p>
               <p className="mt-0.5 text-sm text-amber-800">
                 {task.answer.teacherComment}
               </p>
@@ -257,9 +257,9 @@ export const Part2TaskCard = ({
           )}
         </div>
       ) : (
-        <div className="space-y-4 rounded-2xl border border-gray-100 p-5">
+        <div className="space-y-4 rounded border border-gray-200 p-5">
           {isSubmitted && (
-            <div className="flex items-center gap-2 rounded-xl bg-amber-50 px-4 py-2.5">
+            <div className="flex items-center gap-2 rounded bg-amber-50 px-4 py-2.5">
               <Clock className="h-4 w-4 text-amber-500" />
               <span className="text-sm font-semibold text-amber-700">
                 Сохранено. Ожидает проверки преподавателем.
@@ -279,7 +279,7 @@ export const Part2TaskCard = ({
                 {existingUrls.map((url, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5"
+                    className="flex items-center gap-3 rounded border border-gray-200 bg-gray-50 px-4 py-2.5"
                   >
                     <File className="h-4 w-4 shrink-0 text-gray-400" />
                     <div className="min-w-0 flex-1">
@@ -291,13 +291,13 @@ export const Part2TaskCard = ({
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="shrink-0 text-xs font-medium text-blue-600 hover:underline"
+                      className="shrink-0 text-xs font-medium text-gray-600 hover:underline"
                     >
                       Открыть
                     </a>
                     <button
                       onClick={() => removeExistingUrl(i)}
-                      className="shrink-0 rounded-lg p-1 text-gray-400 hover:bg-red-50 hover:text-red-500"
+                      className="shrink-0 rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
@@ -312,20 +312,20 @@ export const Part2TaskCard = ({
                 {selectedFiles.map((file, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2.5"
+                    className="flex items-center gap-3 rounded border border-gray-200 bg-gray-50 px-4 py-2.5"
                   >
-                    <File className="h-4 w-4 shrink-0 text-blue-500" />
+                    <File className="h-4 w-4 shrink-0 text-gray-400" />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-blue-800">
+                      <p className="truncate text-sm font-medium text-gray-800">
                         {file.name}
                       </p>
-                      <p className="text-xs text-blue-500">
+                      <p className="text-xs text-gray-500">
                         {(file.size / 1024 / 1024).toFixed(1)} МБ · не загружен
                       </p>
                     </div>
                     <button
                       onClick={() => removeSelectedFile(i)}
-                      className="shrink-0 rounded-lg p-1 text-blue-400 hover:bg-blue-100 hover:text-blue-600"
+                      className="shrink-0 rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
@@ -337,7 +337,7 @@ export const Part2TaskCard = ({
             {/* Add file button */}
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-200 py-4 text-sm text-gray-400 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-500"
+              className="flex w-full items-center justify-center gap-2 rounded border-2 border-dashed border-gray-200 py-4 text-sm text-gray-400 transition hover:border-gray-400 hover:bg-gray-50 hover:text-gray-600"
             >
               <Upload className="h-4 w-4" />
               {existingUrls.length + selectedFiles.length > 0
@@ -369,7 +369,7 @@ export const Part2TaskCard = ({
               onChange={(e) => setComment(e.target.value)}
               rows={3}
               placeholder="Можете добавить пояснение к решению..."
-              className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              className="w-full resize-none rounded border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-gray-400 focus:outline-none"
             />
           </div>
 
@@ -377,10 +377,10 @@ export const Part2TaskCard = ({
             onClick={handleSave}
             disabled={!hasAnything || isBusy}
             className={cn(
-              "flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all",
+              "flex w-full items-center justify-center gap-2 rounded py-2.5 text-sm font-semibold transition-all",
               !hasAnything || isBusy
                 ? "cursor-not-allowed bg-gray-100 text-gray-400"
-                : "bg-blue-600 text-white hover:bg-blue-700",
+                : "bg-gray-900 text-white hover:bg-gray-800",
             )}
           >
             {isBusy ? (

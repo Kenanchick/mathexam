@@ -125,7 +125,11 @@ export async function getHomeworkData(studentId: string): Promise<HomeworkPageDa
   }).length;
 
   const deadlines: DeadlineEntry[] = items
-    .filter((i) => i.deadlineIso !== null)
+    .filter(
+      (i) =>
+        i.deadlineIso !== null &&
+        (i.status === "new" || i.status === "in_progress"),
+    )
     .map((i) => ({ title: i.title, deadlineIso: i.deadlineIso! }));
 
   return {

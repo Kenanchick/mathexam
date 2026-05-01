@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Plus, ClipboardList, ArrowRight, Clock, Users, BookOpen, AlertCircle } from "lucide-react";
+import { Plus, ClipboardList, ArrowRight, Clock, Users, BookOpen, AlertCircle, School } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { TeacherHomeworkItem } from "../_lib/getTeacherHomeworkList";
 import type { HomeworkStatus } from "@/lib/generated/prisma/enums";
@@ -25,10 +25,10 @@ const STATUS_LABEL: Record<HomeworkStatus, string> = {
 };
 
 const STATUS_STYLE: Record<HomeworkStatus, string> = {
-  DRAFT: "bg-gray-100 text-gray-600",
-  PUBLISHED: "bg-emerald-50 text-emerald-700",
-  CLOSED: "bg-gray-100 text-gray-500",
-  ARCHIVED: "bg-gray-100 text-gray-400",
+  DRAFT: "border border-gray-300 text-gray-500",
+  PUBLISHED: "border border-gray-800 text-gray-800",
+  CLOSED: "border border-gray-200 text-gray-400",
+  ARCHIVED: "border border-gray-200 text-gray-400",
 };
 
 function formatDeadline(date: Date | null): string {
@@ -90,8 +90,8 @@ export const HomeworkListPage = ({ homeworks }: HomeworkListPageProps) => {
         className="mb-6 flex items-center justify-between"
       >
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Домашние задания</h1>
-          <p className="mt-1 text-base text-gray-500">
+          <h1 className="text-4xl font-bold text-gray-900">Домашние задания</h1>
+          <p className="mt-1.5 text-lg text-gray-500">
             {homeworks.length > 0
               ? `${homeworks.length} заданий · ${counts.published} активных`
               : "Создайте первое домашнее задание"}
@@ -99,7 +99,7 @@ export const HomeworkListPage = ({ homeworks }: HomeworkListPageProps) => {
         </div>
         <Button
           asChild
-          className="gap-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700"
+          className="gap-2 rounded-xl bg-gray-900 text-white hover:bg-gray-800"
         >
           <Link href="/dashboard/teacher/homework/create">
             <Plus className="h-4 w-4" />
@@ -113,9 +113,9 @@ export const HomeworkListPage = ({ homeworks }: HomeworkListPageProps) => {
           <button
             key={id}
             onClick={() => setActiveTab(id)}
-            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+            className={`flex items-center gap-2 rounded-lg px-5 py-2.5 text-base font-medium transition-all ${
               activeTab === id
-                ? "bg-blue-600 text-white shadow-sm"
+                ? "bg-gray-900 text-white shadow-sm"
                 : "text-gray-500 hover:text-gray-800"
             }`}
           >
@@ -123,7 +123,7 @@ export const HomeworkListPage = ({ homeworks }: HomeworkListPageProps) => {
             <span
               className={`rounded-md px-1.5 py-0.5 text-xs font-semibold ${
                 activeTab === id
-                  ? "bg-white/20 text-white"
+                  ? "bg-white/15 text-white"
                   : "bg-gray-100 text-gray-500"
               }`}
             >
@@ -155,7 +155,7 @@ export const HomeworkListPage = ({ homeworks }: HomeworkListPageProps) => {
           {activeTab === "all" && (
             <Button
               asChild
-              className="mt-2 gap-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700"
+              className="mt-2 gap-2 rounded-xl bg-gray-900 text-white hover:bg-gray-800"
             >
               <Link href="/dashboard/teacher/homework/create">
                 <Plus className="h-4 w-4" />
@@ -190,32 +190,33 @@ export const HomeworkListPage = ({ homeworks }: HomeworkListPageProps) => {
                         {STATUS_LABEL[hw.status]}
                       </span>
                       {hw.classroomName ? (
-                        <span className="rounded-lg bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
+                        <span className="flex items-center gap-1 text-xs font-medium text-gray-500">
+                          <School className="h-3 w-3 text-gray-400" />
                           {hw.classroomName}
                         </span>
                       ) : (
-                        <span className="rounded-lg bg-gray-100 px-2.5 py-0.5 text-xs text-gray-500">
+                        <span className="text-xs text-gray-400">
                           Индивидуально
                         </span>
                       )}
                       {hw.pendingReviews > 0 && (
-                        <span className="flex items-center gap-1 rounded-lg bg-orange-50 px-2.5 py-0.5 text-xs font-semibold text-orange-600">
+                        <span className="flex items-center gap-1 rounded-lg border border-gray-700 px-2.5 py-0.5 text-xs font-semibold text-gray-700">
                           <AlertCircle className="h-3 w-3" />
                           {hw.pendingReviews} на проверке
                         </span>
                       )}
                     </div>
 
-                    <h3 className="mt-2 text-[17px] font-semibold text-gray-900">
+                    <h3 className="mt-2 text-xl font-semibold text-gray-900">
                       {hw.title}
                     </h3>
                     {hw.description && (
-                      <p className="mt-1 line-clamp-1 text-sm text-gray-400">
+                      <p className="mt-1 line-clamp-1 text-base text-gray-400">
                         {hw.description}
                       </p>
                     )}
 
-                    <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                    <div className="mt-3 flex flex-wrap items-center gap-4 text-base text-gray-500">
                       <span className="flex items-center gap-1.5">
                         <Clock
                           className={`h-4 w-4 ${
@@ -252,7 +253,7 @@ export const HomeworkListPage = ({ homeworks }: HomeworkListPageProps) => {
                       <div className="mt-3 flex items-center gap-3">
                         <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-100">
                           <motion.div
-                            className="h-full rounded-full bg-blue-500"
+                            className="h-full rounded-full bg-gray-700"
                             initial={{ width: 0 }}
                             animate={{ width: `${progress}%` }}
                             transition={{
@@ -271,7 +272,7 @@ export const HomeworkListPage = ({ homeworks }: HomeworkListPageProps) => {
 
                   <Link
                     href={`/dashboard/teacher/homework/${hw.id}`}
-                    className="flex shrink-0 items-center gap-1.5 rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
+                    className="flex shrink-0 items-center gap-1.5 rounded-xl border border-gray-200 px-5 py-2.5 text-base font-medium text-gray-600 transition-all hover:border-gray-400 hover:bg-gray-50 hover:text-gray-900"
                   >
                     Открыть
                     <ArrowRight className="h-4 w-4" />

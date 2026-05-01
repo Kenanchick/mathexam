@@ -30,41 +30,81 @@ export async function createHomework(
 
   const data = parsed.data;
 
+  // Mode-specific validation
+  if (data.recipientMode === "all" || data.recipientMode === "selected") {
+    if (!data.classroomId) {
+      return { success: false, error: "Выберите класс" };
+    }
+  }
+
   if (
     data.status === "PUBLISHED" &&
-    data.recipientMode === "selected" &&
+    (data.recipientMode === "selected" || data.recipientMode === "personal") &&
     data.selectedStudentIds.length === 0
   ) {
     return { success: false, error: "Выберите хотя бы одного ученика" };
   }
 
-  const classroom = await prisma.classroom.findFirst({
-    where: { id: data.classroomId, teacherId: user.id },
-    select: {
-      id: true,
-      students: {
-        where: { status: "ACTIVE" },
+  let classroomId: string | null = null;
+  let recipientIds: string[] = [];
+
+  if (data.recipientMode === "personal") {
+    // Verify selected students belong to teacher (either via class or direct link)
+    const [classStudents, directStudents] = await Promise.all([
+      prisma.classStudent.findMany({
+        where: {
+          status: "ACTIVE",
+          studentId: { in: data.selectedStudentIds },
+          classroom: { teacherId: user.id, isArchived: false },
+        },
         select: { studentId: true },
-      },
-    },
-  });
+      }),
+      prisma.teacherStudent.findMany({
+        where: {
+          status: "ACTIVE",
+          teacherId: user.id,
+          studentId: { in: data.selectedStudentIds },
+        },
+        select: { studentId: true },
+      }),
+    ]);
+    const allowedIds = new Set([
+      ...classStudents.map((s) => s.studentId),
+      ...directStudents.map((s) => s.studentId),
+    ]);
+    recipientIds = data.selectedStudentIds.filter((id) => allowedIds.has(id));
 
-  if (!classroom) {
-    return { success: false, error: "Класс не найден" };
-  }
-
-  let recipientIds: string[];
-  if (data.recipientMode === "selected") {
-    recipientIds = data.selectedStudentIds;
+    if (recipientIds.length === 0 && data.status === "PUBLISHED") {
+      return { success: false, error: "Выбранные ученики не найдены в ваших классах или среди личных" };
+    }
   } else {
-    // "all" and "individual" (TODO: individual sets per student)
-    recipientIds = classroom.students.map((s) => s.studentId);
+    // "all" or "selected" — class-based
+    const classroom = await prisma.classroom.findFirst({
+      where: { id: data.classroomId, teacherId: user.id },
+      select: {
+        id: true,
+        students: {
+          where: { status: "ACTIVE" },
+          select: { studentId: true },
+        },
+      },
+    });
+
+    if (!classroom) {
+      return { success: false, error: "Класс не найден" };
+    }
+
+    classroomId = classroom.id;
+    recipientIds =
+      data.recipientMode === "selected"
+        ? data.selectedStudentIds
+        : classroom.students.map((s) => s.studentId);
   }
 
   const homework = await prisma.homework.create({
     data: {
       teacherId: user.id,
-      classroomId: data.classroomId,
+      classroomId,
       title: data.title,
       description: data.description ?? null,
       deadline: new Date(data.deadlineAt),
@@ -91,6 +131,7 @@ export async function createHomework(
 
   revalidatePath("/dashboard/teacher");
   revalidatePath("/dashboard/teacher/classes");
+  revalidatePath("/dashboard/teacher/homework");
 
   return { success: true, homeworkId: homework.id, status: data.status };
 }

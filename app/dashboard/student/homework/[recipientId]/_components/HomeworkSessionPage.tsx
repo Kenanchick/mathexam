@@ -31,13 +31,13 @@ const STATUS_LABEL: Record<HomeworkSession["status"], string> = {
 };
 
 const STATUS_STYLE: Record<HomeworkSession["status"], string> = {
-  ASSIGNED: "bg-blue-50 text-blue-600",
-  IN_PROGRESS: "bg-amber-50 text-amber-600",
-  SUBMITTED: "bg-orange-50 text-orange-600",
-  CHECKING: "bg-yellow-50 text-yellow-700",
-  CHECKED: "bg-emerald-50 text-emerald-700",
-  RETURNED: "bg-purple-50 text-purple-700",
-  OVERDUE: "bg-red-50 text-red-600",
+  ASSIGNED: "border border-gray-200 bg-gray-50 text-gray-600",
+  IN_PROGRESS: "border border-gray-200 bg-gray-50 text-gray-600",
+  SUBMITTED: "border border-gray-200 bg-gray-50 text-gray-600",
+  CHECKING: "border border-gray-200 bg-gray-50 text-gray-600",
+  CHECKED: "border border-emerald-200 bg-emerald-50 text-emerald-700",
+  RETURNED: "border border-amber-200 bg-amber-50 text-amber-700",
+  OVERDUE: "border border-red-200 bg-red-50 text-red-600",
 };
 
 function formatDeadline(date: Date | null): string {
@@ -170,14 +170,14 @@ export const HomeworkSessionPage = ({ session }: Props) => {
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.28 }}
-        className="mb-5 rounded-2xl border border-gray-200 bg-white px-6 py-4 shadow-sm"
+        className="mb-5 rounded border border-gray-200 bg-white px-6 py-4"
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="mb-1 flex flex-wrap items-center gap-2">
               <span
                 className={cn(
-                  "rounded-lg px-2.5 py-0.5 text-xs font-semibold",
+                  "rounded px-2.5 py-0.5 text-xs font-medium",
                   STATUS_STYLE[session.status],
                 )}
               >
@@ -215,12 +215,12 @@ export const HomeworkSessionPage = ({ session }: Props) => {
           initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
-          className="mb-5 rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4"
+          className="mb-5 rounded border border-gray-200 bg-gray-50 px-5 py-4"
         >
-          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-blue-500">
+          <p className="mb-1 text-xs font-medium uppercase tracking-wide text-gray-500">
             Комментарий преподавателя
           </p>
-          <p className="text-sm leading-relaxed text-blue-900 whitespace-pre-wrap">
+          <p className="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap">
             {session.description}
           </p>
         </motion.div>
@@ -234,19 +234,19 @@ export const HomeworkSessionPage = ({ session }: Props) => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.25 }}
             className={cn(
-              "mb-5 rounded-2xl border px-6 py-4",
+              "mb-5 rounded border px-6 py-4",
               session.status === "CHECKED"
                 ? "border-emerald-200 bg-emerald-50"
-                : "border-purple-200 bg-purple-50",
+                : "border-amber-200 bg-amber-50",
             )}
           >
             <div className="flex items-center gap-4">
               <div
                 className={cn(
-                  "flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-xl font-bold",
+                  "flex h-14 w-14 shrink-0 items-center justify-center rounded text-xl font-bold",
                   session.status === "CHECKED"
                     ? "bg-emerald-100 text-emerald-700"
-                    : "bg-purple-100 text-purple-700",
+                    : "bg-amber-100 text-amber-700",
                 )}
               >
                 {Math.round(session.scorePercent)}%
@@ -257,7 +257,7 @@ export const HomeworkSessionPage = ({ session }: Props) => {
                     "text-base font-bold",
                     session.status === "CHECKED"
                       ? "text-emerald-800"
-                      : "text-purple-800",
+                      : "text-amber-800",
                   )}
                 >
                   {session.status === "CHECKED"
@@ -270,7 +270,7 @@ export const HomeworkSessionPage = ({ session }: Props) => {
                       "mt-0.5 text-sm",
                       session.status === "CHECKED"
                         ? "text-emerald-700"
-                        : "text-purple-700",
+                        : "text-amber-700",
                     )}
                   >
                     {session.teacherComment}
@@ -286,10 +286,10 @@ export const HomeworkSessionPage = ({ session }: Props) => {
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="mb-5 flex items-center gap-3 rounded-2xl border border-orange-200 bg-orange-50 px-5 py-4"
+          className="mb-5 flex items-center gap-3 rounded border border-gray-200 bg-gray-50 px-5 py-4"
         >
-          <Clock className="h-5 w-5 shrink-0 text-orange-500" />
-          <p className="text-sm font-medium text-orange-700">
+          <Clock className="h-5 w-5 shrink-0 text-gray-400" />
+          <p className="text-sm font-medium text-gray-600">
             Работа сдана. Ожидает проверки преподавателем.
           </p>
         </motion.div>
@@ -300,15 +300,15 @@ export const HomeworkSessionPage = ({ session }: Props) => {
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="mb-5 flex items-center gap-3 rounded-2xl border border-purple-200 bg-purple-50 px-5 py-4"
+          className="mb-5 flex items-center gap-3 rounded border border-amber-200 bg-amber-50 px-5 py-4"
         >
-          <RotateCcw className="h-5 w-5 shrink-0 text-purple-500" />
+          <RotateCcw className="h-5 w-5 shrink-0 text-amber-500" />
           <div>
-            <p className="text-sm font-medium text-purple-700">
+            <p className="text-sm font-medium text-amber-700">
               Работа возвращена на доработку.
             </p>
             {session.teacherComment && (
-              <p className="mt-0.5 text-xs text-purple-600">
+              <p className="mt-0.5 text-xs text-amber-600">
                 {session.teacherComment}
               </p>
             )}
@@ -324,7 +324,7 @@ export const HomeworkSessionPage = ({ session }: Props) => {
         className="grid grid-cols-[260px_1fr] gap-5"
       >
         {/* Left sidebar */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="rounded border border-gray-200 bg-white p-4">
           <TaskSidebar
             tasks={session.tasks}
             currentIndex={currentIndex}
@@ -344,7 +344,7 @@ export const HomeworkSessionPage = ({ session }: Props) => {
         </div>
 
         {/* Task content */}
-        <div className="min-h-[500px] rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="min-h-[500px] rounded border border-gray-200 bg-white p-6">
           {currentTask ? (
             currentTask.examNumber <= 12 ? (
               <Part1TaskCard

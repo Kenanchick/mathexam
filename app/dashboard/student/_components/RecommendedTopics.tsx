@@ -1,4 +1,3 @@
-import { BookOpen } from "lucide-react";
 import Link from "next/link";
 import type { StudentDashboardView } from "../_lib/getStudentDashboard";
 
@@ -8,65 +7,56 @@ export const RecommendedTopics = ({
   topics: StudentDashboardView["recommendedTopics"];
 }) => {
   return (
-    <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-      <div className="mb-5">
-        <h2 className="text-xl font-bold text-gray-900">
+    <section className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+      <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-6 py-3.5">
+        <h2 className="text-[18px] font-semibold text-gray-900">
           Рекомендованные темы
         </h2>
-        <p className="mt-1 text-sm text-gray-500">
-          Темы, которые стоит повторить
-        </p>
+        <Link
+          href="/dashboard/student/tasks"
+          className="text-[15px] text-gray-500 transition hover:text-gray-900"
+        >
+          Все темы →
+        </Link>
       </div>
 
       {topics.length === 0 ? (
-        <div className="rounded-2xl border border-gray-100 bg-gray-50 p-5 text-sm text-gray-500">
+        <div className="px-6 py-8 text-[16px] text-gray-500">
           Пока недостаточно данных для рекомендаций. Решите несколько задач.
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="divide-y divide-gray-200">
           {topics.map((topic) => (
             <div
               key={topic.id}
-              className="rounded-2xl border border-gray-200 bg-white p-4"
+              className="flex min-h-[66px] items-center gap-7 px-6 py-3.5"
             >
-              <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
-                  <BookOpen className="h-6 w-6" />
-                </div>
-
-                <h3 className="text-sm font-bold text-gray-900">
+              <div className="min-w-0 flex-1">
+                <p className="text-[16px] font-medium text-gray-900">
                   {topic.title}
-                </h3>
+                </p>
+                <p className="mt-1 line-clamp-1 text-[15px] text-gray-500">
+                  {topic.description}
+                </p>
               </div>
 
-              <p className="min-h-[54px] line-clamp-3 text-sm leading-snug text-gray-500">
-                {topic.description}
-              </p>
-
-              <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-gray-100">
-                <div
-                  className="h-full rounded-full bg-red-500"
-                  style={{ width: `${topic.percent}%` }}
-                />
-              </div>
-
-              <div className="mt-3 flex items-center justify-between text-sm">
-                <span className="text-gray-500">Освоение</span>
-                <span className="font-semibold text-red-500">
-                  {topic.percent}%
-                </span>
+              <div className="w-40 shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-2 flex-1 overflow-hidden rounded-sm bg-gray-200">
+                    <div
+                      className="h-full bg-gray-600"
+                      style={{ width: `${topic.percent}%` }}
+                    />
+                  </div>
+                  <span className="w-9 text-right text-[14px] font-medium text-gray-600">
+                    {topic.percent}%
+                  </span>
+                </div>
               </div>
             </div>
           ))}
         </div>
       )}
-
-      <Link
-        href="/dashboard/student/tasks"
-        className="mt-5 inline-flex text-sm font-semibold text-blue-600 hover:underline"
-      >
-        Смотреть все темы →
-      </Link>
     </section>
   );
 };

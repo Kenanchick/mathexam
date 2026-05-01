@@ -34,7 +34,7 @@ function getTaskIcon(
     return <Clock className="h-3.5 w-3.5 text-amber-400" />;
   }
   if (task.examNumber >= 13 && task.answer?.fileUrl) {
-    return <FileText className="h-3.5 w-3.5 text-blue-400" />;
+    return <FileText className="h-3.5 w-3.5 text-gray-400" />;
   }
   return null;
 }
@@ -61,9 +61,9 @@ export const TaskSidebar = ({
             {answeredCount} / {tasks.length}
           </span>
         </div>
-        <div className="h-1.5 overflow-hidden rounded-full bg-gray-100">
+        <div className="h-1.5 overflow-hidden rounded-sm bg-gray-100">
           <div
-            className="h-full rounded-full bg-blue-500 transition-all duration-500"
+            className="h-full bg-gray-900 transition-all duration-500"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -80,17 +80,17 @@ export const TaskSidebar = ({
               key={task.homeworkTaskId}
               onClick={() => onSelect(index)}
               className={cn(
-                "flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-all",
+                "flex w-full items-center gap-2.5 rounded px-3 py-2.5 text-left transition-all",
                 isActive
-                  ? "bg-blue-50 text-blue-700"
-                  : "text-gray-700 hover:bg-gray-50",
+                  ? "bg-gray-100 text-gray-900"
+                  : "text-gray-600 hover:bg-gray-50",
               )}
             >
               <span
                 className={cn(
-                  "flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold",
+                  "flex h-6 w-6 shrink-0 items-center justify-center rounded text-[11px] font-bold",
                   isActive
-                    ? "bg-blue-600 text-white"
+                    ? "bg-gray-900 text-white"
                     : "bg-gray-100 text-gray-600",
                 )}
               >
@@ -113,9 +113,9 @@ export const TaskSidebar = ({
       {!isReadOnly && (
         <div className="mt-4 border-t border-gray-100 pt-4">
           {scorePercent !== null ? (
-            <div className="rounded-xl bg-emerald-50 p-3 text-center">
+            <div className="rounded bg-gray-50 p-3 text-center">
               <p className="text-xs text-gray-500">Итоговый балл</p>
-              <p className="text-2xl font-bold text-emerald-700">
+              <p className="text-2xl font-bold text-gray-900">
                 {Math.round(scorePercent)}%
               </p>
             </div>
@@ -124,9 +124,9 @@ export const TaskSidebar = ({
               onClick={onSubmit}
               disabled={submitting || !canSubmit}
               className={cn(
-                "flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all",
+                "flex w-full items-center justify-center gap-2 rounded px-4 py-2.5 text-sm font-semibold transition-all",
                 canSubmit && !submitting
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  ? "bg-gray-900 text-white hover:bg-gray-800"
                   : "cursor-not-allowed bg-gray-100 text-gray-400",
               )}
             >
